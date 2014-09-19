@@ -1,0 +1,21 @@
+- DONE Admin - link resolutions to columns
+- DONE View - put cards in right columns
+- DONE Admin - drop rule by default configuration
+- View - drop rules implementation
+- View - form popup for drop rules
+- Admin - drop rules configuration
+- DONE Admin - define column for US sorting
+- DONE View  - US sorting
+- DONE Admin - first column by default (checkbox - put all cards with undefined resolution into column by default)
+- DONE View - order tasks by priority
+- DONE View - order user stories by priority (user story points)
+- View  - first column by default 
+- View - filter by assigned persons
+- Admin - adapters - coloring support
+- View - adapters - coloring support
+- View - colors by extrafield
+- Admin - releases management
+- View - indicators - progress by tasks number
+- View - indicators - progress by tasks cost
+- View - indicators - burndown chart
+- View - indicators - velocity calculation
