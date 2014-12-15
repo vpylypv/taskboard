@@ -32,7 +32,6 @@ $target_phase_id = getStringFromRequest('target_phase_id');
 
 $task = $taskboard->TrackersAdapter->getTask($task_id);
 if( $task ) {
-	// TODO drop task
 
 	$ret['task'] = $taskboard->getMappedTask( $task );
 	$source_phase_id = $ret['task']['phase_id'];
@@ -45,12 +44,16 @@ if( $task ) {
 	if( !$drop_rule->getID() ) {
 		$ret['alert'] = _('Drop rule is not defined for this target column');
 	} else {
+		db_begin();
 		$cannot_drop_msg = $drop_rule->drop($task);
 		if( !$cannot_drop_msg ) {
+			db_commit();
 			if( $drop_rule->getAlertText() ) {
 				$ret['alert'] = $drop_rule->getAlertText();
 			}
+			$ret['task'] = $taskboard->getMappedTask( $task );
 		} else {
+			db_rollback();
 			$ret['alert'] =  $cannot_drop_msg;
 		}
 	}

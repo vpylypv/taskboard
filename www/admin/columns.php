@@ -50,7 +50,7 @@ $columns = $taskboard->getColumns();
 
 <?php
 
-        $tablearr = array(_('Order'),_('Title'),_('Max number of tasks'),_('Resolutions'));
+        $tablearr = array(_('Order'),_('Title'),_('Max number of tasks'),_('Assigned resolutions'),_('Drop resolution'));
 
         echo $HTML->listTableTop($tablearr, false, 'sortable_table_tracker', 'sortable_table_tracker');
         foreach( $columns as $column ) {
@@ -72,6 +72,7 @@ $columns = $taskboard->getColumns();
                         	$column->getTitle() ).'</a></td>
 			<td>'.$column->getMaxTasks().'</td>
 			<td>'.implode(', ', array_values( $column->getResolutions() )).'</td>
+			<td>'.$column->getResolutionByDefault().'</td>
 		</tr>
 		';
 	}

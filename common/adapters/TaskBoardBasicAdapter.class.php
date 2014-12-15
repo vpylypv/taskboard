@@ -38,7 +38,7 @@ class TaskBoardBasicAdapter {
 	var $_ust=NULL; // user stories tracker
 	var $_tt=array(); // tasks trackers
 	var $_fields=array();
-	var $_res=array();
+	var $_res=array(); // hash os resolution values element_id => element_name
 
 	function TaskBoardBasicAdapter($TaskBoard) {
                 $this->TaskBoard = $TaskBoard;
@@ -131,38 +131,14 @@ class TaskBoardBasicAdapter {
                                 if( $f['alias'] == 'resolution' ) {
 					$ef = new ArtifactExtraField($at, $f);
 					foreach( $ef->getAvailableValues() as $v) {
-						$ret[] = $v['element_name'];
+						$ret[ $v['element_name'] ] = $v['element_id'];
 					}
 					$this->_res[$tracker_id] = $ret;
                                 }
                         }
                 }
 
-                return $this->_res[$tracker_id];
-        }
-
-	/**
-         *
-         */
-        function setResolution($task, $resolution_name) {
-                $ret = array();
-
-                if( !array_key_exists($tracker_id, $this->_res) ) {
-                        $at = $this->getTasksTracker($tracker_id);
-
-                        $extra_fields = $at->getExtraFields();
-                        foreach($extra_fields as $f) {
-                                if( $f['alias'] == 'resolution' ) {
-                                        $ef = new ArtifactExtraField($at, $f);
-                                        foreach( $ef->getAvailableValues() as $v) {
-                                                $ret[] = $v['element_name'];
-                                        }
-                                        $this->_res[$tracker_id] = $ret;
-                                }
-                        }
-                }
-
-                return $this->_res[$tracker_id];
+                return array_keys( $this->_res[$tracker_id] );
         }
 
 	/**
@@ -199,20 +175,44 @@ class TaskBoardBasicAdapter {
 	/**
          *
          */
-        function updateTask($task_id, $assigned_to, $extra_fields=array() ) {
-		$artifact = &artifact_get_object( $task_id );
+        function updateTask(&$artifact, $assigned_to, $resolution ) {
 
 		if( !$assigned_to ) {
 			$assigned_to = $artifact->getAssignedTo();
 		}
 
-		return $artifact->update(
+		$tracker_id = $artifact->ArtifactType->getID();
+		$extra_fields = $artifact->getExtraFieldData();
+
+                if( !array_key_exists($tracker_id, $this->_res) ) {
+                        $this->getResolutionValues($tracker_id);
+                }
+
+                $fields_ids = $this->getFieldsIds( $tracker_id );
+
+                if( array_key_exists( 'resolution', $fields_ids ) ) {
+                        $resolution_field_id = $fields_ids['resolution'];
+
+			if( array_key_exists( $resolution, $this->_res[$tracker_id] ) ){
+				$extra_fields[ $resolution_field_id ] = $this->_res[$tracker_id][$resolution]; 
+			}
+                }
+
+		$ret = $artifact->update(
 			$artifact->getPriority(),
 			$artifact->getStatusId(),
                 	$assigned_to,
-			$atifact->$this->getSummary(),
-			NULL,NULL,NULL,
+			htmlspecialchars_decode( $artifact->getSummary() ),
+			100,
+			htmlspecialchars_decode( $artifact->getDetails() ),
+			$tracker_id,
                 	$extra_fields);
+
+		if( !$ret ) {
+			return $artifact->getErrorMessage();
+		}
+
+		return '';
 	}
 }
 // Local Variables:

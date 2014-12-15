@@ -328,18 +328,18 @@ class TaskBoardColumnSource extends Error {
          *
          *      @return string    error message if cannot drop
          */
-        function drop($task) {
+        function drop(&$task) {
 		$msg = '';
-
-		$task = $this->getTaskboard()->TrackersAdapter->setResolution($task, $this->getTargetResolution() );
-		$extra_fields = $task->getExtraFieldData();
 
 		$assigned_to = NULL;
 		if( $this->getAutoassign() ) {
-			
+			$assigned_to = user_getid();
 		}
 
-		$this->getTaskboard()->TrackersAdapter->updateTask( $task->getID(),$assigned_to,$extra_fields);
+		$msg = $this->getTaskboard()->TrackersAdapter->updateTask( $task,$assigned_to, $this->getTargetResolution() );
+		if( $msg ) {
+			$msg = _('Tracker error:') .' '.$msg;
+		}
 
 		return $msg;
 	}

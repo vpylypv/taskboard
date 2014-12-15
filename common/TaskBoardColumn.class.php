@@ -413,8 +413,8 @@ class TaskBoardColumn extends Error {
 	/**
          *
          */
-        function getDropRulesByDefault() {
-		if( !$this->drop_rules_by_default ) {
+        function getDropRulesByDefault($reread=false) {
+		if( !$this->drop_rules_by_default || $reread) {
 			$this->drop_rules_by_default = taskboard_default_column_source_get_object( $this->getID() );
 		}
 
