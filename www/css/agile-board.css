@@ -56,22 +56,20 @@
 }
 
 .agile-sticker-body {
-	height: 63px;
-	border-left: solid #CCCCCC 1px;
-	border-right: solid #CCCCCC 1px;
 	padding: 2px;
 }
 
-.agile-sticker-user-story .agile-sticker-body {
-	background-color: #E0FFFF;
+.agile-sticker-user-story {
+	background-color: #FFFF99;
 }
 
 .agile-sticker-task {
 	z-index: 999;
+	background-color: #FFFFCC;
 }
 
 .agile-sticker-task .agile-sticker-body, .agile-sticker-task .agile-sticker-header {
-	background-color: #FFFACD;
+/* 	background-color: #FFFACD; */
 }
 
 .agile-phase-hovered {

@@ -88,6 +88,13 @@ $columns = $taskboard->getColumns();
                         <tr><td><strong><?php echo _('Title backgound color') ?></strong></td><td><?= $taskboard->colorBgChooser('title_bg_color') ?></td></tr>
                         <tr><td><strong><?php echo _('Column Background color') ?></strong></td><td><?= $taskboard->colorBgChooser('column_bg_color', 'none') ?></td></tr>
 			<tr><td><strong><?php echo _('Maximum tasks number') ?></strong></td><td><input type="text" name="column_max_tasks"></td></tr>
+			<tr><td><strong><?php echo _('Drop resolution by default') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><select id="resolution_by_default" name="resolution_by_default">
+<?php
+foreach( $taskboard->getUnusedResolutions() as $resolution ) {
+	echo '<option value="'.htmlspecialchars( $resolution).'">' . htmlspecialchars( $resolution) . "</option>";
+}
+?>
+</select></td></tr>
                 </table>
 
 <p>
@@ -97,3 +104,4 @@ $columns = $taskboard->getColumns();
 <?php
         echo utils_requiredField().' '._('Indicates required fields.');
 ?>
+

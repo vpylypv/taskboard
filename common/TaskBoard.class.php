@@ -710,6 +710,34 @@ class TaskBoard extends Error {
 
 		return $resolutions;	
 	}
+
+	function getUnusedResolutions() {
+                $resolutions = array();
+
+
+		// TODO return only unused resolutions
+
+                $tasks_trackers = $this->getUsedTrackersIds()  ;
+                foreach( $tasks_trackers as $tracker_id ) {
+                        $ef_values = $this->TrackersAdapter->getResolutionValues($tracker_id);
+                        if( count($resolutions) == 0 ) {
+                                foreach( $ef_values as $v) {
+                                        $resolutions[] = $v;
+                                }
+                        } else {
+                                $buf = array();
+                                foreach( $resolutions as $r ) {
+                                        if( in_array( $r, $ef_values ) ){
+                                                $buf[] = $r;
+                                        }
+                                }
+                                $resolutions = $buf;
+                        }
+                }
+
+                return $resolutions;
+        }
+
 }
 
 // Local Variables:

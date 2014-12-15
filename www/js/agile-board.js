@@ -52,9 +52,6 @@ function drawUserStories() {
 			l_sHtml += '<div class="agile-sticker agile-sticker-user-story">';
 			l_sHtml += '<div class="agile-sticker-header"><a href="#">' + us.id + '</a> : ' + us.title + "</div>\n";
 			l_sHtml += '<div class="agile-sticker-body">' + us.description + "</div>\n";
-			l_sHtml += '<div class="agile-sticker-footer">';
-			l_sHtml += '<div id="user-story-progress-' +us.id + '" style="height: 12px; width: 150px; background: #FFFF99; float: left;"><span style="position:absolute; margin-left:10px;"></div>&nbsp;<span>RAF : </span><span id="user-story-raf-' + us.id + '"></span>';
-			l_sHtml += "</div>\n</div>\n";
 			l_sHtml += "</div></td>\n";
 		}
 
@@ -151,26 +148,6 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 	}
 }
 
-function updateUserStory( oUserStory ) {
-	var nTotalCost=0;
-	var nTotalRaf=0;
-	
-	for(var j=0 ; j<oUserStory.tasks.length ; j++) {
-		nTotalCost += oUserStory.tasks[j].estimated_dev_effort;
-		nTotalRaf  += oUserStory.tasks[j].remaining_estimated_effort;
-	}
-
-	drawProgressBar("#user-story-progress-" + oUserStory.id, nTotalCost, (nTotalCost - nTotalRaf));	
-	
-	$( "#user-story-raf-" + oUserStory.id ).html( nTotalRaf);
-}
-
-function drawProgressBar( id, estimated, remaining ) {
-    $( id ).append(
-        "<div style='width: " + (remaining * 100 / estimated ) + "%; height: 12px; background-color: #00FF00;'></div>"
-    );
-}
-
 function drawUserStory( oUserStory ) {
 	
 	for( var i=0; i<aPhases.length ; i++ ) {
@@ -195,12 +172,7 @@ function drawUserStory( oUserStory ) {
 		}
 	}
 	
-	var nTotalCost=0;
-	var nTotalRaf=0;
 	for(var j=0 ; j<oUserStory.tasks.length ; j++) {
-		nTotalCost += oUserStory.tasks[j].estimated_dev_effort;
-		nTotalRaf  += oUserStory.tasks[j].remaining_estimated_effort
-		
 		$('#task-' + oUserStory.tasks[j].id)
 			.data('task_id', oUserStory.tasks[j].id)
 			.data('user_story_id', oUserStory.id)
@@ -213,15 +185,8 @@ function drawUserStory( oUserStory ) {
 			      stop: helperTaskStop,
 			      helper: "clone"
 			} );
-		
-		// draw progress bar
-		drawProgressBar("#task-progress-" + oUserStory.tasks[j].id, oUserStory.tasks[j].estimated_dev_effort, oUserStory.tasks[j].remaining_estimated_effort);
 	}			
 
-	$( "#user-story-progress-" + oUserStory.id ).html('<span style="position:absolute; margin-left:10px;">Cost: ' + nTotalCost + '</span>');
-	drawProgressBar("#user-story-progress-" + oUserStory.id, nTotalCost, (nTotalCost - nTotalRaf));
-	
-	$( "#user-story-raf-" + oUserStory.id ).html( nTotalRaf);
 	
 //	initEditable();
 
@@ -234,16 +199,11 @@ function drawTasks( oUserStory, sPhaseId ) {
 		tsk = oUserStory.tasks[i];
 		if( taskInPhase( tsk, sPhaseId ) ) {
 			l_sHtml += '<div class="agile-sticker-container">';
-        	        l_sHtml += '<div class="agile-sticker agile-sticker-task agile-sticker-task-' + tsk.user_story + '" id="task-' + tsk.id + '">';
+        	        l_sHtml += '<div class="agile-sticker agile-sticker-task agile-sticker-task-' + tsk.user_story + '" id="task-' + tsk.id + '" >';
                 	l_sHtml += '<div class="agile-sticker-header" style="background-color: ' + tsk.background + ';">';
 	                l_sHtml += '<a href="#">' + tsk.id + '</a> : ' + tsk.title;
         	        l_sHtml += "</div>\n";
                 	l_sHtml += '<div class="agile-sticker-body">' + tsk.description + '</div>';
-	                l_sHtml += '<div class="agile-sticker-footer">';
-        	        l_sHtml += '<div id="task-progress-' + tsk.id + '" style="height: 12px; width: 150px; background: #FFFF99; float: left;">';
-			l_sHtml += '<span style="position:absolute; margin-left:10px;">Cost: ' + tsk.estimated_dev_effort + '</span>';
-			l_sHtml += "</div>\n";
-			l_sHtml += '&nbsp;<span>RAF: </span><div style="float: right; width: 30px;" id="task-raf-' + tsk.id + '" class="task-raf">' + tsk.remaining_estimated_effort + '</div></div>';
  			l_sHtml += "</div></div>\n";
 		}
 	}
