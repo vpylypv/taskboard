@@ -51,6 +51,12 @@ class TaskBoardHtml extends TaskBoard {
 				if($action=='edit_column') {
 					$labels[] = _('Configure Columns');
                                 	$links[]  = '/plugins/taskboard/admin/index.php?group_id='.$group_id.'&action=columns';
+
+					$column_id = getStringFromRequest('column_id','');
+					if( $column_id ) {
+						$labels[] = _('Delete Column');
+        	                                $links[]  = '/plugins/taskboard/admin/index.php?group_id='.$group_id.'&action=delete_column&column_id='.$column_id;
+					}
 				}
 			}
 		} 

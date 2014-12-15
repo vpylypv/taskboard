@@ -108,24 +108,8 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 				if( aUserStories[i].tasks[j].id == nTaskId ) {
 					l_nSourcePhaseId = aUserStories[i].tasks[j].phase_id;
 				
-					// apply some rules from phase configuration
-					if( l_oTargetPhase && l_oTargetPhase.rules ) {
-						// if exist a particular rule for current source phase
-						var l_oRules = l_oTargetPhase.rules['*'];
-
-						if( l_oTargetPhase.rules[l_nSourcePhaseId] ) {
-							l_oRules = l_oTargetPhase.rules[l_nSourcePhaseId];
-						}
-						
-						// then apply rules
-						if( l_oRules ) {
-							if( l_oRules.alert ) {
-								alert( l_oRules.alert );
-							} 
-
-							aUserStories[i].tasks[j].resolution =  l_oRules.target_resolution;
-					
-							// try to save modifications
+					if( l_oTargetPhase  ) {
+							// try to drop card 
 							$.ajax({
                 						type: 'POST',
 					                	url: '/plugins/taskboard/ajax.php',
@@ -140,12 +124,22 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 					        	}).done(function( answer ) {
                         					if(answer['message']) {
 			                	                	showMessage(answer['message'], 'error');
-									// change phase back
 		        		                	}
 
-								loadTaskboard( gGroupId );
+								if(answer['alert']) {
+									alert( answer['alert'] );
+								}
+
+								if(answer['action'] == 'reload') {
+									// reload whole board
+									loadTaskboard( gGroupId );
+								}
+
+								if( answer['task'] ) {
+									// change particular task data
+									aUserStories[i].tasks[j] = answer['task']; 
+								}
         						});
-						}
 					}
 				}	
 			}			

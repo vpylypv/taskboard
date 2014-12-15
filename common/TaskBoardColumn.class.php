@@ -151,10 +151,85 @@ class TaskBoardColumn extends Error {
                 return true;
         }
 
-	function setOrder($order){
-		// TODO recalculate order of other columns
+	function delete(){
+                $res = db_query_params (
+                        'DELETE FROM plugin_taskboard_columns_resolutions WHERE taskboard_column_id=$1',
+                        array (
+                                $this->getID()
+                        )
+                ) ;
+                if (!$res) {
+                        return false;
+                }
+
+
 		$res = db_query_params (
-                        'UPDATE plugin_taskboard_columns SET order=$1 WHERE taskboard_column_id=$2',
+                        'DELETE FROM plugin_taskboard_columns_sources WHERE target_taskboard_column_id=$1',
+                        array (
+                                $this->getID()
+                        )
+                ) ;
+                if (!$res) {
+                        return false;
+                }
+
+		$res = db_query_params (
+                        'DELETE FROM plugin_taskboard_columns_sources WHERE source_taskboard_column_id=$1',
+                        array (
+                                $this->getID()
+                        )
+                ) ;
+
+
+                if (!$res) {
+                        return false;
+                }
+
+		$res = db_query_params (
+                        'DELETE FROM plugin_taskboard_columns WHERE taskboard_column_id=$1',
+                        array (
+                                $this->getID()
+                        )
+                ) ;
+                if (!$res) {
+                        return false;
+                }
+
+		// reorder other fields
+		$res = db_query_params (
+                        'UPDATE plugin_taskboard_columns SET order_num=order_num-1 WHERE order_num>$1 AND taskboard_id=$2',
+                        array (
+                                $this->getOrder(),
+                                $this->getTaskBoardID()
+                        )
+                ) ;
+		if (!$res) {
+                        return false;
+                }
+	
+
+
+                return true;
+        }
+
+
+	function setOrder($order){
+		// get columns having the given order
+		$res = db_query_params (
+                        'UPDATE plugin_taskboard_columns SET order_num=$1 WHERE order_num=$2 AND taskboard_id=$3',
+                        array (
+                                $order-1,
+                                $order,
+				$this->getTaskBoardID()
+                        )
+                ) ;
+                if (!$res) {
+                        return false;
+                }
+
+
+		$res = db_query_params (
+                        'UPDATE plugin_taskboard_columns SET order_num=$1 WHERE taskboard_column_id=$2',
                         array (
                                 $order,
                                 $this->getID()
@@ -213,6 +288,16 @@ class TaskBoardColumn extends Error {
         function getID() {
                 return $this->data_array['taskboard_column_id'];
         }
+
+	/**
+         *      getiTaskboardID - get related TaskBoard ID.
+         *
+         *      @return int     The taskboard_id
+         */
+        function getTaskBoardID() {
+                return $this->data_array['taskboard_id'];
+        }
+
 
 	/**
          *      getDomID - get identifier for DOM on HTML page

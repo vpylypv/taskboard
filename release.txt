@@ -1,0 +1,7 @@
+0.1.1 - agileboard configuration
+0.1.0 - AgileBoard configuration
+0.2.0 - AgileBoard rendering
+0.3.0 - tasks drag'n'drop
+0.4.0 - tasks and user stories simple creation
+0.5.0 - releases management & burndown chart
+0.6.0 - popup form for tasks (e.g., when some mandatory fields are missing)

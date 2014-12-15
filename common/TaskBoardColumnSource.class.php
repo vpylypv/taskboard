@@ -322,6 +322,36 @@ class TaskBoardColumnSource extends Error {
 
 		return $ret;
 	}
+
+	/**
+         *      drop task
+         *
+         *      @return string    error message if cannot drop
+         */
+        function drop($task) {
+		$msg = '';
+
+		$task = $this->getTaskboard()->TrackersAdapter->setResolution($task, $this->getTargetResolution() );
+		$extra_fields = $task->getExtraFieldData();
+
+		$assigned_to = NULL;
+		if( $this->getAutoassign() ) {
+			
+		}
+
+		$this->getTaskboard()->TrackersAdapter->updateTask( $task->getID(),$assigned_to,$extra_fields);
+
+		return $msg;
+	}
+
+	function getTaskBoard() {
+		if( !$this->Taskboard ) {
+			$TargetColumn = taskboard_column_get_object( $this->getTargetColumnID() );
+			$this->Taskboard = $TargetColumn->Taskboard;
+		}
+
+		return $this->Taskboard;
+	}
 }
 
 // Local Variables:

@@ -44,8 +44,7 @@ foreach( $columns as $column ) {
 		'title' => $column->getTitle(),
 		'titlebackground' => $column->getTitleBackgroundColor(),
 	   	'background' => $column->getColumnBackgroundColor(),
-		'resolutions' =>  array_values( $column->getResolutions() ),
-		'rules' => $column->getDropRules()
+		'resolutions' =>  array_values( $column->getResolutions() )
 	);
 }
 

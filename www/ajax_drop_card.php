@@ -20,7 +20,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-$ret = array();
+$ret = array(
+	'message' => '',
+	'action' => ''
+);
 
 $ret['message'] = '';
 
@@ -30,9 +33,30 @@ $target_phase_id = getStringFromRequest('target_phase_id');
 $task = $taskboard->TrackersAdapter->getTask($task_id);
 if( $task ) {
 	// TODO drop task
+
+	$ret['task'] = $taskboard->getMappedTask( $task );
+	$source_phase_id = $ret['task']['phase_id'];
+
+	$drop_rule = taskboard_column_source_get_object($source_phase_id,$target_phase_id);
+	if( !$drop_rule->getID() ) {
+		$drop_rule = taskboard_default_column_source_get_object($target_phase_id); 
+	}
+
+	if( !$drop_rule->getID() ) {
+		$ret['alert'] = _('Drop rule is not defined for this target column');
+	} else {
+		$cannot_drop_msg = $drop_rule->drop($task);
+		if( !$cannot_drop_msg ) {
+			if( $drop_rule->getAlertText() ) {
+				$ret['alert'] = $drop_rule->getAlertText();
+			}
+		} else {
+			$ret['alert'] =  $cannot_drop_msg;
+		}
+	}
 } else {
-	$ret['message'] = _('Task is not found. Reload taskboard, please.');
+	$ret['alert'] = _('Task is not found. Taskboard will be reloaded.');
+	$ret['action'] = 'reload';
 }
-//$DropRule = taskboard_column_source_get_object( $target_phase_id );
 
 echo json_encode( $ret );

@@ -541,27 +541,41 @@ class TaskBoard extends Error {
 		foreach( $tasks_trackers as $tasks_tracker_data ) {
 			$tasks = $this->TrackersAdapter->getTasks($tasks_tracker_data['group_artifact_id'], $release);
 			foreach( $tasks as $task ) {
-				$task_maped = $this->_mapTask( $tasks_tracker_data, $task );
-				$task_maped['background'] = $tasks_tracker_data['card_background_color'];
-				$column = taskboard_column_get_object_by_resolution( $this, $task_maped['resolution'] );
-				if( $column ) {
-					$task_maped['phase_id'] = $column->getID(); 
-					$stories[intval($task_maped['user_story'])]['tasks'][] = $task_maped ;
-				} else {
-					error_log( 'Column is not defined for resolution '.$task_maped['resolution'] );
-					if( $this->getFirstColumnByDefault() ) {
-						// TODO put this task into the first column
-					}
-				}
+				$task_maped = $this->getMappedTask( $task );
+				$stories[intval($task_maped['user_story'])]['tasks'][] = $task_maped ;
 			}
 		}
-		// TODO sort tasks - tasks will be ordered on taskboard
 
 		$ret_stories = array_values($stories);
 		usort( $ret_stories, array( $this, 'sortUserStories' ) );
 
                 return $ret_stories;
         }
+
+	function getMappedTask( $task ) {
+		static $_used_trackers_data = NULL;
+
+		if( !$_used_trackers_data ) {
+			foreach(  $this->getUsedTrackersData() as $tasks_tracker_data) {
+				$_used_trackers_data[ $tasks_tracker_data['group_artifact_id'] ] = $tasks_tracker_data;
+			}
+		}
+
+		$task_maped = $this->_mapTask( $task );
+                $column = taskboard_column_get_object_by_resolution( $this, $task_maped['resolution'] );
+                if( $column ) {
+	                $task_maped['phase_id'] = $column->getID();
+                } else {
+        	        error_log( 'Column is not defined for resolution '.$task_maped['resolution'] );
+                        if( $this->getFirstColumnByDefault() ) {
+                	        // TODO put this task into the first column
+                        }
+                }
+
+		$task_maped['background'] = $_used_trackers_data[$task->ArtifactType->getID()]['card_background_color'];
+
+		return $task_maped;
+	}
 
 	function sortUserStories($u1, $u2) {
 		$ret = 0;
@@ -594,12 +608,12 @@ class TaskBoard extends Error {
         }
 
 
-	private function _mapTask( $tasks_tracker_data, $task ) {
+	private function _mapTask( $task ) {
 		$ret = array();
 	
 		$us_ref_field = $this->getUserStoriesReferenceField();
 
-		$fields_ids = $this->TrackersAdapter->getFieldsIds($tasks_tracker_data['group_artifact_id']);
+		$fields_ids = $this->TrackersAdapter->getFieldsIds($task->ArtifactType->getID() );
 		$extra_data = $task->getExtraFieldDataText();	
 
 		$ret['id'] = $task->getID();
@@ -608,10 +622,11 @@ class TaskBoard extends Error {
 		$ret['assigned_to'] = $task->getAssignedRealName();
 		$ret['priority'] = $task->getPriority();
 		foreach( array( 'resolution', 'estimated_dev_effort', 'remaining_estimated_effort', 'user_story') as $f){
+			$ret[$f] = '';
 			if( array_key_exists( $f, $fields_ids ) ) {
-				$ret[$f] = $extra_data[$fields_ids[$f]]['value'];
-			} else {
-				$ret[$f] = '';
+				if( array_key_exists( $fields_ids[$f], $extra_data ) ) {
+					$ret[$f] = $extra_data[$fields_ids[$f]]['value'];
+				}
 			}
 		}
 

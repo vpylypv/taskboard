@@ -54,9 +54,18 @@ $columns = $taskboard->getColumns();
 
         echo $HTML->listTableTop($tablearr, false, 'sortable_table_tracker', 'sortable_table_tracker');
         foreach( $columns as $column ) {
+		$downLink = '';
+		if( $column->getOrder() < count( $columns ) ) {
+			$downLink = util_make_link ('/plugins/taskboard/admin/?group_id='.$group_id.'&amp;action=down_column&amp;column_id='.$column->getID(), "<img alt='" ._('Down'). "' src='/images/pointer_down.png'>" );
+		}
+
 		echo '
                 <tr valign="middle">
-			<td>'.$column->getOrder().'</td>
+			<td>'.
+				$column->getOrder().
+				"&nbsp;".
+				$downLink .
+			'</td>
 			<td>
 			<div style="float: left; border: 1px solid grey; height: 30px; width: 20px; background-color: '.$column->getColumnBackgroundColor().'; margin-right: 10px;"><div style="width: 100%; height: 10px; background-color: '.$column->getTitleBackgroundColor().';"></div></div>'.
 				util_make_link ('/plugins/taskboard/admin/?group_id='.$group_id.'&amp;action=edit_column&amp;column_id='.$column->getID(),

@@ -142,6 +142,30 @@ class TaskBoardBasicAdapter {
         }
 
 	/**
+         *
+         */
+        function setResolution($task, $resolution_name) {
+                $ret = array();
+
+                if( !array_key_exists($tracker_id, $this->_res) ) {
+                        $at = $this->getTasksTracker($tracker_id);
+
+                        $extra_fields = $at->getExtraFields();
+                        foreach($extra_fields as $f) {
+                                if( $f['alias'] == 'resolution' ) {
+                                        $ef = new ArtifactExtraField($at, $f);
+                                        foreach( $ef->getAvailableValues() as $v) {
+                                                $ret[] = $v['element_name'];
+                                        }
+                                        $this->_res[$tracker_id] = $ret;
+                                }
+                        }
+                }
+
+                return $this->_res[$tracker_id];
+        }
+
+	/**
 	 *
 	 */
 	function getTasks($tracker_id,$filter=NULL) {
