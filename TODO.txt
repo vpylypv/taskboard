@@ -1,9 +1,6 @@
 - DONE Admin - link resolutions to columns
 - DONE View - put cards in right columns
 - DONE Admin - drop rule by default configuration
-- View - drop rules implementation
-- View - form popup for drop rules
-- Admin - drop rules configuration
 - DONE Admin - define column for US sorting
 - DONE View  - US sorting
 - DONE Admin - first column by default (checkbox - put all cards with undefined resolution into column by default)
