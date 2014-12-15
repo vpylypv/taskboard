@@ -20,6 +20,37 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+
+$column_id = getStringFromRequest('column_id','');
+
+$column = &taskboard_column_get_object($column_id);
+if (getStringFromRequest('post_changes')) {
+        $resolutions  = getArrayFromRequest('resolutions', array());
+        $column_title = getStringFromRequest('column_title','');
+        $title_bg_color = getStringFromRequest('title_bg_color','');
+        $color_bg_color = getStringFromRequest('column_bg_color','');
+        $column_max_tasks = getStringFromRequest('column_max_tasks','');
+
+        $column->update($column_title, $title_bg_color, $color_bg_color, $column_max_tasks);
+        $column->setResolutions($resolutions);
+
+        $resolution_by_default =  getStringFromRequest('resolution_by_default','');
+        $alert = getStringFromRequest('alert','');
+        $autoassign = getIntFromRequest('autoassign',0);
+        $set_rules = getStringFromRequest('set_rules','');
+
+        db_begin();
+        if( $column->setDropRule(NULL, $resolution_by_default, $alert, $autoassign, $set_rules) ) {
+                db_commit();
+		$feedback .= _('Succefully Updated');
+        } else {
+                db_rollback();
+                exit_error( $column->getErrorMessage() );
+        }
+}
+
+
+
 $taskboard->header(
 	array(
 		'title'=>'Taskboard for '.$group->getPublicName().' : Administration : Column configuration' ,
@@ -35,32 +66,6 @@ if( $taskboard->isError() ) {
 	echo '<div id="messages" style="display: none;"></div>';
 }
 
-$column_id = getStringFromRequest('column_id','');
-
-$column = &taskboard_column_get_object($column_id);
-if (getStringFromRequest('post_changes')) {
-	$resolutions  = getArrayFromRequest('resolutions', array());
-	$column_title = getStringFromRequest('column_title','');	
-	$title_bg_color = getStringFromRequest('title_bg_color','');
-	$color_bg_color = getStringFromRequest('column_bg_color','');
-	$column_max_tasks = getStringFromRequest('column_max_tasks','');
-
-	$column->update($column_title, $title_bg_color, $color_bg_color, $column_max_tasks);
-	$column->setResolutions($resolutions);
-
-	$resolution_by_default =  getStringFromRequest('resolution_by_default','');
-	$alert = getStringFromRequest('alert','');
-	$autoassign = getIntFromRequest('autoassign',0);
-	$set_rules = getStringFromRequest('set_rules','');
-
-	db_begin();	
-	if( $column->setDropRule(NULL, $resolution_by_default, $alert, $autoassign, $set_rules) ) {
-		db_commit();
-	} else {
-		db_rollback();
-		exit_error( $column->getErrorMessage() );
-	}
-}
 $drop_rules_by_default = $column->getDropRulesByDefault(true);
 
 ?>

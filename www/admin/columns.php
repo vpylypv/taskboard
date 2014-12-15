@@ -20,6 +20,21 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+
+$column_title = getStringFromRequest('column_title','');
+$title_bg_color = getStringFromRequest('title_bg_color','');
+$color_bg_color = getStringFromRequest('column_bg_color','');
+$column_max_tasks = getStringFromRequest('column_max_tasks','');
+
+
+if (getStringFromRequest('post_changes')) {
+        if( $taskboard->addColumn($column_title, $title_bg_color, $color_bg_color, $column_max_tasks) ) {
+                $feedback.=_('Successfully Added');
+        }
+}
+
+
+
 $taskboard->header(
 	array(
 		'title'=>'Taskboard for '.$group->getPublicName().' : Administration : Columns configuration' ,
@@ -33,16 +48,6 @@ if( $taskboard->isError() ) {
 	echo '<div id="messages" class="error">'.$taskboard->getErrorMessage().'</div>';
 } else {
 	echo '<div id="messages" style="display: none;"></div>';
-}
-
-$column_title = getStringFromRequest('column_title','');
-$title_bg_color = getStringFromRequest('title_bg_color','');
-$color_bg_color = getStringFromRequest('column_bg_color','');
-$column_max_tasks = getStringFromRequest('column_max_tasks','');
-
-
-if (getStringFromRequest('post_changes')) {
-	$taskboard->addColumn($column_title, $title_bg_color, $color_bg_color, $column_max_tasks);
 }
 
 $columns = $taskboard->getColumns();
