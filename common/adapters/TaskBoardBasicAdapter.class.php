@@ -204,15 +204,39 @@ class TaskBoardBasicAdapter {
                 	$assigned_to,
 			htmlspecialchars_decode( $artifact->getSummary() ),
 			100,
-			htmlspecialchars_decode( $artifact->getDetails() ),
+			'',
 			$tracker_id,
-                	$extra_fields);
+                	$extra_fields,
+			htmlspecialchars_decode( $artifact->getDetails() )
+			);
 
 		if( !$ret ) {
 			return $artifact->getErrorMessage();
 		}
 
 		return '';
+	}
+
+	function updateTaskDescription(&$artifact, $desc ) {
+                $tracker_id = $artifact->ArtifactType->getID();
+                $extra_fields = $artifact->getExtraFieldData();
+
+                $ret = $artifact->update(
+                        $artifact->getPriority(),
+                        $artifact->getStatusId(),
+			$artifact->getAssignedTo(),
+                        htmlspecialchars_decode( $artifact->getSummary() ),
+                        100,
+                        '',
+                        $tracker_id,
+                        $extra_fields,
+			$desc);
+
+                if( !$ret ) {
+                        return $artifact->getErrorMessage();
+                }
+
+                return '';
 	}
 }
 // Local Variables:

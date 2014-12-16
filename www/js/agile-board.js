@@ -1,17 +1,17 @@
 var aTaskboardUserStories = [];
 
 function cleanMessages() {
-	$('#messages').html('').hide();
+	jQuery('#messages').html('').hide();
 }
 
 function showMessage( msg_text, msg_class) {
-	$('#messages').removeClass().addClass( msg_class ).html( msg_text ).show();
+	jQuery('#messages').removeClass().addClass( msg_class ).html( msg_text ).show();
 }
 
 function loadTaskboard( group_id ) {
-	$('#agile-board tbody').html('');
+	jQuery('#agile-board tbody').html('');
 
-        $.ajax({
+        jQuery.ajax({
                 type: 'POST',
                 url: '/plugins/taskboard/ajax.php',
                 dataType: 'json',
@@ -28,13 +28,16 @@ function loadTaskboard( group_id ) {
                         aUserStories = answer['user_stories'];
                         aPhases = answer['phases'];
 
-                        $( "#agile-board" ).append(
+                        jQuery( "#agile-board" ).append(
                                 drawUserStories()
                         );
 
                         for(var i=0 ; i<aUserStories.length ; i++) {
                                 drawUserStory( aUserStories[i] );
                         };
+
+			initUserStories();
+			initEditable();
         });
 }
 
@@ -42,7 +45,7 @@ function loadTaskboard( group_id ) {
 function drawUserStories() {
 	var l_sHtml = '';
 
-	for( i=0; i<aUserStories.length; i++ ) {
+	for( var i=0; i<aUserStories.length; i++ ) {
 		l_sHtml += "<tr valign='top'>\n";
 		var start=0;
 		var us=aUserStories[i];
@@ -55,7 +58,7 @@ function drawUserStories() {
 			l_sHtml += "</div></td>\n";
 		}
 
-		for( j=start; j<aPhases.length; j++) {
+		for( var j=start; j<aPhases.length; j++) {
 			var ph=aPhases[j];
 			var style = '';
 			if( ph.background ) {
@@ -72,19 +75,22 @@ function drawUserStories() {
 }
 
 function helperTaskStart ( event, ui ) {
-	$(this).css('opacity', 0.5);
+	jQuery(this).css('opacity', 0.5);
 }
 
 function helperTaskStop ( event, ui ) {	
-	$(this).css('opacity', 1);
+	jQuery(this).css('opacity', 1);
 }
 
 function helperTaskDrop ( event, ui ) {
-	var l_nUserStoryId = $( ui.draggable ).data('user_story_id');
-	var l_nTaskId      = $( ui.draggable ).data('task_id');
-	var l_nTargetPhaseId     = $(this).data('phase_id');
+	var d = jQuery( ui.draggable );
+	if( d.length ) {
+		var l_nUserStoryId = d.data('user_story_id');
+		var l_nTaskId      = d.data('task_id');
+		var l_nTargetPhaseId     = jQuery(this).data('phase_id');
 	
-	setPhase( l_nUserStoryId, l_nTaskId, l_nTargetPhaseId );
+		setPhase( l_nUserStoryId, l_nTaskId, l_nTargetPhaseId );
+	}
 }
 
 function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
@@ -105,9 +111,9 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 				if( aUserStories[i].tasks[j].id == nTaskId ) {
 					l_nSourcePhaseId = aUserStories[i].tasks[j].phase_id;
 				
-					if( l_oTargetPhase  ) {
+					if( l_oTargetPhase && l_nSourcePhaseId != nTargetPhaseId ) {
 							// try to drop card 
-							$.ajax({
+							jQuery.ajax({
                 						type: 'POST',
 					                	url: '/plugins/taskboard/ajax.php',
 					                	dataType: 'json',
@@ -136,44 +142,59 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 									// change particular task data
 									aUserStories[i].tasks[j] = answer['task']; 
 								}
+
+								if( l_oUserStory ) {
+							                drawUserStory(l_oUserStory);
+							        }
+
         						});
 					}
 				}	
 			}			
 		}
 	} 
-	
-	if( l_oUserStory ) {
-		drawUserStory(l_oUserStory);
+}
+
+function initUserStories() {
+	for( var i=0; i<aUserStories.length; i++ ) {
+        	initUserStory( aUserStories[i] );
 	}
 }
 
-function drawUserStory( oUserStory ) {
-	
+function initUserStory( oUserStory ) {
 	for( var i=0; i<aPhases.length ; i++ ) {
-		if( aPhases[i].id != 'user-stories') {
-			var sPhaseId = "#" + aPhases[i].id + "-" + oUserStory.id;
-			$( sPhaseId ).html(
-				drawTasks( oUserStory, aPhases[i].id )
-			);
-			
-			//make phase droppable
-			$( sPhaseId )
-				.data('phase_id', aPhases[i].id)
-				.droppable( {
-				      accept: '.agile-sticker-task-' + oUserStory.id,
-				      hoverClass: 'agile-phase-hovered',
-				      drop: helperTaskDrop
-				} );
-				
-		    	if( aPhases[i].background ) {
-		        	$("#" + aPhases[i].id + "-" + oUserStory.id).css('background-color', aPhases[i].background );
-		    	}
-		}
-	}
-	
+                if( aPhases[i].id != 'user-stories') {
+                        var sPhaseId = "#" + aPhases[i].id + "-" + oUserStory.id;
+
+                        //make phase droppable
+                        jQuery( sPhaseId )
+                                .data('phase_id', aPhases[i].id)
+                                .droppable( {
+                                      accept: '.agile-sticker-task-' + oUserStory.id,
+                                      hoverClass: 'agile-phase-hovered',
+                                      drop: helperTaskDrop
+                                } );
+
+                        if( aPhases[i].background ) {
+                                jQuery("#" + aPhases[i].id + "-" + oUserStory.id).css('background-color', aPhases[i].background );
+                        }
+                }
+        }
+}
+
+function drawUserStory( oUserStory ) {
+
+	for( var i=0; i<aPhases.length ; i++ ) {
+                if( aPhases[i].id != 'user-stories') {
+                        var sPhaseId = "#" + aPhases[i].id + "-" + oUserStory.id;
+                        jQuery( sPhaseId ).html(
+                                drawTasks( oUserStory, aPhases[i].id )
+                        );
+                }
+        }
+
 	for(var j=0 ; j<oUserStory.tasks.length ; j++) {
-		$('#task-' + oUserStory.tasks[j].id)
+		jQuery('#task-' + oUserStory.tasks[j].id)
 			.data('task_id', oUserStory.tasks[j].id)
 			.data('user_story_id', oUserStory.id)
 			.draggable( {
@@ -183,19 +204,16 @@ function drawUserStory( oUserStory ) {
 			      revert: true,
 			      start: helperTaskStart,
 			      stop: helperTaskStop,
-			      helper: "clone"
+			      helper: "clone",
+			      distance: 10
 			} );
 	}			
-
-	
-//	initEditable();
-
 }
 
 function drawTasks( oUserStory, sPhaseId ) {
 	var l_sHtml = '' ;
 
-	for( i=0; i<oUserStory.tasks.length; i++ ) {
+	for( var i=0; i<oUserStory.tasks.length; i++ ) {
 		tsk = oUserStory.tasks[i];
 		if( taskInPhase( tsk, sPhaseId ) ) {
 			l_sHtml += '<div class="agile-sticker-container">';
@@ -226,134 +244,53 @@ function taskInPhase( tsk, phase ) {
 }
 
 function initEditable() {
-	$("div.agile-sticker-body").dblclick( function () {
-		if( $(this).children('textarea').length == 0 ) {
-	    	var l_sDescription = $(this).html();
-			$(this).html( '<textarea id="text_description" name="description" rows="11"></textarea>');
+	jQuery("div.agile-sticker-body").dblclick( function () {
+		if( jQuery(this).children('textarea').length == 0 ) {
+			var l_oDesc = jQuery(this);
+	    		var l_sDescription = l_oDesc.html();
+			var l_nTaskId = jQuery(this).parent().data('task_id');
+			jQuery(this).html( '<textarea id="text_description" name="description" rows="11"></textarea>');
 
-			$('#text_description').html( l_sDescription ).css('width', '98%').css('height', '95%');
-			$('#text_description').keypress(function(e) {
+			jQuery('#text_description').text( l_sDescription.replace(/<br>/g, "\n") ).css('width', '98%').css('height', '95%').focus();
+			jQuery('#text_description').keydown(function(e) {
 				if( e.keyCode == 27 ) {
 					// ESC == cancel
-					$("div[id='description']").html( l_sDescription );
+					l_oDesc.html( l_sDescription );
+					event.preventDefault();
+				} else if ( e.keyCode == 13 && !e.shiftKey) {
+					e.preventDefault();
+					// ENTER - submit
+					var textField = this;
+							jQuery.ajax({
+                                                                type: 'POST',
+                                                                url: '/plugins/taskboard/ajax.php',
+                                                                dataType: 'json',
+                                                                data : {
+                                                                        action   : 'update_description',
+                                                                        group_id : gGroupId,
+                                                                        task_id : l_nTaskId,
+                                                                        desc : jQuery(this).val()
+                                                                },
+                                                                async: true 
+                                                        }).done(function( answer ) {
+                                                                if(answer['message']) {
+                                                                        showMessage(answer['message'], 'error');
+                                                                }
+
+								if(answer['action'] == 'reload') {
+                                                                        // reload whole board
+                                                                        loadTaskboard( gGroupId );
+                                                                }
+
+								l_oDesc.html(jQuery(textField).val().replace(/\n/g, '<br>') );
+                                                        }).fail(function( jqxhr, textStatus, error ) {
+								var err = textStatus + ', ' + error;
+								alert(err);
+							});
+
 				}
 			});
 		}
 	});	
 	
-	$("div.task-raf").dblclick( function () {
-		if( $(this).children('input').length == 0 ) {
-	    	var l_nRaf = $(this).html();
-			$(this).html( '<input type="text" id="task-raf-editable" name="task-raf-editable" value="' +l_nRaf+ '">');
-
-			$('#task-raf-editable').keypress(function(e) {
-				if( e.keyCode == 27 ) {
-					// ESC == cancel
-					$("span[id='task-raf-editable']").html( l_nRaf );
-				} else if( e.keyCode == 13 ) {
-					// Enter == submit
-					$(this).parent().html( $(this).val());
-				}
-			}).css('width', '30px').css('height', '15px').css('font-size', 9);
-		}
-	});
-	
 }
-
-/*
-	$( "#scrum-board" ).append(
-		$( "#tmpl-scrum-user-story" ).render( aUserStories, { 'phases' : aPhases, 'showUserStories' : g_bShowUserStories } )
-	);
-
-	for(var i=0 ; i<aUserStories.length ; i++) {
-		drawUserStory( aUserStories[i] );		
-	}
-*/
-
-/*
-<script id="tmpl-scrum-task" type="text/x-jsrender">
-{{if phase == ~phase_id}}
-            <div class="scrum-sticker-container">
-				<div class="scrum-sticker scrum-sticker-task scrum-sticker-task-{{>~userStoryId}}" id="task-{{>id}}">
-					<div class="scrum-sticker-header">
-						<a href="#" title="Reference to GForge task in generic tracker">{{>id}}</a> : {{>title}}
-					</div>
-					<div class="scrum-sticker-body">
-						{{>description}}
-					</div>
-					<div class="scrum-sticker-footer">
-						<div id="task-progress-{{>id}}" style="height: 12px; width: 150px; background: #FFFF99; float: left;"><span style="position:absolute; margin-left:10px;">Cost: {{>estimated_dev_effort}}</span></div>&nbsp;<span>RAF: </span><div style="float: right; width: 30px;" id="task-raf-{{>id}}" class="task-raf">{{>remaining_estimated_effort}}</div>
-					</div>
-				</div>
-			</div>
-{{/if}}
-</script>
-
-<script id="tmpl-scrum-user-story-tasks" type="text/x-jsrender">
-</script>
-
-<script id="tmpl-scrum-user-story" type="text/x-jsrender">
-	<tr class="scrum-user-story" valign="top">
-        {{if ~showUserStories==true}}
-		<td class="scrum-phase">
-			<!-- div class="scrum-phase-body scrum-phase-body-{{>id}}" -->
-			<div class="scrum-sticker-container">
-				<div class="scrum-sticker scrum-sticker-user-story">
-					<div class="scrum-sticker-header"{{if background!=null}} style="background: {{>background}};"{{/if}}>
-						{{>title}}
-					</div>
-					<div class="scrum-sticker-body"{{if background}} style="background: {{>background}};"{{/if}}>
-						{{>description}}
-					</div>
-					<div class="scrum-sticker-footer">
-						<div id="user-story-progress-{{>id}}" style="height: 12px; width: 150px; background: #FFFF99; float: left;"><span style="position:absolute; margin-left:10px;"></div>&nbsp;<span>RAF : </span><span id="user-story-raf-{{>id}}"></span>
-					</div>
-				</div>
-			</div>
-			<!-- /div -->
-		</td>
-		{{/if}}
-			
-		{{for ~phases ~userStoryId=id}}
-		{{if id!='phase-user-stories'}}
-		<td id="{{>id}}-{{>~userStoryId}}" class="scrum-phase"{{if background!=null}} style="background: {{>background}};"{{/if}}>		
-			<!-- div class="scrum-phase-body scrum-phase-body-{{>~userStoryId}}" id="{{>id}}-{{>~userStoryId}}" -->
-			<!-- /div -->
-		</td>	
-		{{/if}}		
-		{{/for}}
-
-	</tr>
-</script>
-
-</head>
-<body>
-<div style="font-size: 14px; padding-bottom: 14px;">
-	<div class="navigation">
-	    <a href="index.html">Scrum board</a>&nbsp;|&nbsp;
-		<a href="sprints.html">Sprints management</a>&nbsp;|&nbsp;
-		<a href="indicators.html">Indicators</a>&nbsp;|&nbsp;
-		<a href="admin.html">Administration</a>
-	</div>
-</div>
-<div>
-	<div class="navigation" style="float: left; width: 50%;">
-		Sprint:
-		<select>
-			<option>V1.1.0</option>
-			<option>V1.2.0</option>
-			<option selected>V1.3.0</option>
-		</select>
-	</div>
-	<div style="float: right; width: 40%; text-align: right;">
-	Historize board for <input type="text" id="scrum-board-date">
-	<button>Ok</button>
-	</div>
-</div>
-<br/><br/>
-<table id="scrum-board">
-</table>
-</body>
-</html>
-
-*/

@@ -600,7 +600,7 @@ class TaskBoard extends Error {
 
                 if( $t1['priority'] < $t2['priority'] ) {
                         $ret = 1;
-                } elseif( $t1['priority'] > $u2['priority'] ) {
+                } elseif( $t1['priority'] > $t2['priority'] ) {
                         $ret = -1;
                 }
 
@@ -618,7 +618,7 @@ class TaskBoard extends Error {
 
 		$ret['id'] = $task->getID();
 		$ret['title'] = $task->getSummary();
-		$ret['description'] = $task->getDetails();
+		$ret['description'] = str_replace("\n", '<br>', $task->getDetails() );
 		$ret['assigned_to'] = $task->getAssignedRealName();
 		$ret['priority'] = $task->getPriority();
 		foreach( array( 'resolution', 'estimated_dev_effort', 'remaining_estimated_effort', 'user_story') as $f){

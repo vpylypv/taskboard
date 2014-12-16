@@ -109,41 +109,9 @@ bShowUserStories = <?= $taskboard->getUserStoriesTrackerID() ? 'true' : 'false' 
 aUserStories = [];
 aPhases = []
 
-/*
-function loadTaskboard( group_id ) {
-        $.ajax({
-                type: 'POST',
-                url: '/plugins/taskboard/ajax.php',
-                dataType: 'json',
-                data : {
-                        action   : 'load_taskboard',
-                        group_id : group_id
-                },
-                async: false
-	}).done(function( answer ) {
-                        if(answer['message']) {
-                                showMessage(answer['message'], 'error');
-                        }
-
-			aUserStories = answer['user_stories'];
-			aPhases = answer['phases'];
-
-			$( "#agile-board" ).append(
-				drawUserStories()
-        		);
-
-			for(var i=0 ; i<aUserStories.length ; i++) {
-                		drawUserStory( aUserStories[i] );
-        		};
-        });
-}
-*/
-
-$( 
-	function () {
+jQuery( document ).ready(function( $ ) {
 		loadTaskboard( <?= $group_id ?> );
-	}
-);
+});
 </script>
 <?php
 	}
