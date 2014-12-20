@@ -64,6 +64,7 @@ if (!$group_id) {
 		)
 	);
 
+
         if( $taskboard->isError() ) {
 		exit_error($taskboard->getErrorMessage());
 	} else {
@@ -78,7 +79,7 @@ if (!$group_id) {
 
 <link rel="stylesheet" type="text/css" href="/plugins/taskboard/css/agile-board.css">
 <script type="text/javascript" src="/plugins/taskboard/js/agile-board.js?<?= time() ?>"></script>
-<script type="text/javascript" src="/plugins/taskboard/js/jquery-ui-1.9.2.custom.min.js"></script>
+<script type="text/javascript" src="/plugins/taskboard/js/jquery-ui.js"></script>
 <table id="agile-board">
 	<thead>
 		<tr valign="top">

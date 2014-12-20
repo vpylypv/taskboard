@@ -34,7 +34,7 @@ class TaskBoardHtml extends TaskBoard {
 		global $DOCUMENT_ROOT,$HTML,$group_id;
 
 		use_javascript('/js/sortable.js');
-		use_javascript('/scripts/jquery/jquery.min.js');
+		html_use_jquery();		
 
 		$params['toptab']='taskboard';
 		$params['group']=$group_id;

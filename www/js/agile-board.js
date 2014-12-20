@@ -53,7 +53,7 @@ function drawUserStories() {
 			start=1;
 			l_sHtml += '<td class="agile-phase"><div class="agile-sticker-container">';
 			l_sHtml += '<div class="agile-sticker agile-sticker-user-story">';
-			l_sHtml += '<div class="agile-sticker-header"><a href="#">' + us.id + '</a> : ' + us.title + "</div>\n";
+			l_sHtml += '<div class="agile-sticker-header"><a href="#">' + us.id + '</a> : <span>' + us.title + "</span></div>\n";
 			l_sHtml += '<div class="agile-sticker-body">' + us.description + "</div>\n";
 			l_sHtml += "</div></td>\n";
 		}
@@ -146,7 +146,7 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 								if( l_oUserStory ) {
 							                drawUserStory(l_oUserStory);
 							        }
-
+								initEditable();
         						});
 					}
 				}	
@@ -219,7 +219,7 @@ function drawTasks( oUserStory, sPhaseId ) {
 			l_sHtml += '<div class="agile-sticker-container">';
         	        l_sHtml += '<div class="agile-sticker agile-sticker-task agile-sticker-task-' + tsk.user_story + '" id="task-' + tsk.id + '" >';
                 	l_sHtml += '<div class="agile-sticker-header" style="background-color: ' + tsk.background + ';">';
-	                l_sHtml += '<a href="#">' + tsk.id + '</a> : ' + tsk.title;
+	                l_sHtml += '<a href="#">' + tsk.id + '</a> : <span>' + tsk.title + '</span>';
         	        l_sHtml += "</div>\n";
                 	l_sHtml += '<div class="agile-sticker-body">' + tsk.description + '</div>';
  			l_sHtml += "</div></div>\n";
@@ -244,19 +244,87 @@ function taskInPhase( tsk, phase ) {
 }
 
 function initEditable() {
+	// title
+	jQuery("div.agile-sticker-header span").dblclick( function () {
+		if( jQuery(this).children('input').length == 0 ) {	
+			jQuery('#text_description').trigger('focusout');
+                        jQuery('#text_title').trigger('focusout');
+
+
+			var l_oTitle = jQuery(this);
+			var l_sTitle = l_oTitle.text();
+                        var l_nTaskId = jQuery(this).parent().parent().data('task_id');
+
+			jQuery(this).html( '<input id="text_title" name="title" type="text">');
+			jQuery('#text_title').val( l_sTitle ).css('width', '90%').focus().focusout(function() {
+				l_oTitle.text( l_sTitle );
+			}) ;
+
+
+			jQuery('#text_title').keydown(function(e) {
+				if( e.keyCode == 27 ) {
+                                        // ESC == cancel
+                                        l_oTitle.text( l_sTitle );
+                                        e.preventDefault();
+                                }  else if ( e.keyCode == 13 && !e.shiftKey) {
+                                        e.preventDefault();
+                                        // ENTER - submit
+                                        var textField = this;
+                                                        jQuery.ajax({
+                                                                type: 'POST',
+                                                                url: '/plugins/taskboard/ajax.php',
+                                                                dataType: 'json',
+                                                                data : {
+                                                                        action   : 'update',
+                                                                        group_id : gGroupId,
+                                                                        task_id : l_nTaskId,
+                                                                        title : jQuery(this).val()
+                                                                },
+                                                                async: true
+                                                        }).done(function( answer ) {
+                                                                if(answer['message']) {
+                                                                        showMessage(answer['message'], 'error');
+                                                                }
+
+                                                                if(answer['action'] == 'reload') {
+                                                                        // reload whole board
+                                                                        loadTaskboard( gGroupId );
+                                                                }
+
+                                                                l_oTitle.html( jQuery(textField).val() );
+                                                        }).fail(function( jqxhr, textStatus, error ) {
+                                                                var err = textStatus + ', ' + error;
+                                                                alert(err);
+                                                        });
+
+                                }
+ 
+			});
+		}
+	});
+
+	// description
 	jQuery("div.agile-sticker-body").dblclick( function () {
 		if( jQuery(this).children('textarea').length == 0 ) {
+			// close open textarea
+			jQuery('#text_description').trigger('focusout');
+			jQuery('#text_title').trigger('focusout');
+
+
 			var l_oDesc = jQuery(this);
 	    		var l_sDescription = l_oDesc.html();
 			var l_nTaskId = jQuery(this).parent().data('task_id');
 			jQuery(this).html( '<textarea id="text_description" name="description" rows="11"></textarea>');
 
-			jQuery('#text_description').text( l_sDescription.replace(/<br>/g, "\n") ).css('width', '98%').css('height', '95%').focus();
+			
+			jQuery('#text_description').text( l_sDescription.replace(/<br>/g, "\n") ).css('width', '98%').css('height', '95%').focus().focusout(function() {
+	 l_oDesc.html( l_sDescription );
+}) ;
 			jQuery('#text_description').keydown(function(e) {
 				if( e.keyCode == 27 ) {
 					// ESC == cancel
 					l_oDesc.html( l_sDescription );
-					event.preventDefault();
+					e.preventDefault();
 				} else if ( e.keyCode == 13 && !e.shiftKey) {
 					e.preventDefault();
 					// ENTER - submit
@@ -266,7 +334,7 @@ function initEditable() {
                                                                 url: '/plugins/taskboard/ajax.php',
                                                                 dataType: 'json',
                                                                 data : {
-                                                                        action   : 'update_description',
+                                                                        action   : 'update',
                                                                         group_id : gGroupId,
                                                                         task_id : l_nTaskId,
                                                                         desc : jQuery(this).val()
@@ -294,3 +362,4 @@ function initEditable() {
 	});	
 	
 }
+
