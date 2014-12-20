@@ -43,8 +43,7 @@ function &taskboard_column_source_get_object($taskboard_source_column_id,$taskbo
 			        'source_taskboard_column_id' => $taskboard_source_column_id,
 			        'target_resolution' => '',
 		        	'alert' => NULL,
-			        'autoassign' => 0,
-			        'set_rules' => ''
+			        'autoassign' => 0
 			);
 	        } else {
 			$data = db_fetch_array($res);
@@ -77,8 +76,7 @@ function &taskboard_default_column_source_get_object($taskboard_target_column_id
         	                'source_taskboard_column_id' => NULL,
                 	        'target_resolution' => '',
                         	'alert' => NULL,
-	                        'autoassign' => 0,
-        	                'set_rules' => ''
+	                        'autoassign' => 0
 	                );
         	} else {
 	        	$data = db_fetch_array($res);
@@ -189,22 +187,8 @@ class TaskBoardColumnSource extends Error {
                 return $this->data_array['autoassign'];
         }
 
-	/**
-         *      getRules - get rules, that shouldbe checked/performed when card is droped from source column to the target one
-         *
-         *      @return string
-         */
-        function getRules() {
-                return $this->data_array['set_rules'];
-        }
 
-
-
-        function save($target_resolution, $alert='', $autoassign=0, $set_rules='') {
-		if( $set_rules && !$this->checkRules(set_rules) ) {
-                        return false;
-		}
-
+        function save($target_resolution, $alert='', $autoassign=0) {
 
 		if( $this->getSourceColumnID()  ) {
 			$source_column_id = intval(  $this->getSourceColumnID() );
@@ -227,14 +211,13 @@ class TaskBoardColumnSource extends Error {
 		if( $row ) {
 			// update rule
 			$res = db_query_params (
-                                "UPDATE plugin_taskboard_columns_sources SET target_resolution=$1, alert=$2, autoassign=$3, set_rules=$4
-                                WHERE taskboard_column_source_id=$5
+                                "UPDATE plugin_taskboard_columns_sources SET target_resolution=$1, alert=$2, autoassign=$3
+                                WHERE taskboard_column_source_id=$4
                                 ",
                                 array (
                                         $target_resolution,
                                         $alert,
                                         $autoassign,
-                                        $set_rules,
 					$row['taskboard_column_source_id']
                                 )
                         ) ;
@@ -242,15 +225,14 @@ class TaskBoardColumnSource extends Error {
 		} else {
 			// insert rule
 			$res = db_query_params (
-                                "INSERT INTO plugin_taskboard_columns_sources(target_taskboard_column_id, source_taskboard_column_id, target_resolution, alert, autoassign, set_rules) 
-				VALUES($1,$source_column_id,$2,$3,$4,$5)
+                                "INSERT INTO plugin_taskboard_columns_sources(target_taskboard_column_id, source_taskboard_column_id, target_resolution, alert, autoassign) 
+				VALUES($1,$source_column_id,$2,$3,$4)
                                 ",
                                 array (
 					$this->getTargetColumnID(),
 					$target_resolution, 
 					$alert, 
-					$autoassign, 
-					$set_rules
+					$autoassign 
 				)
                 	) ;
 		}
@@ -258,69 +240,6 @@ class TaskBoardColumnSource extends Error {
 		if( !$res ) {
 			$this->setError('TaskBoardColumnSource: cannot save drop rule');
 		}
-	}
-
-	/**
-         *      checkRules - check text of rules
-         *
-         *      @return boolean
-         */
-        function checkRules($in_sRules) {
-		$ret = true;
-
-		$lines = explode( "\n", $in_sRules );
-
-		$ef = array();
-		foreach( $this->Taskboard->getUsedTrackersIds() as $tracker_id ) {
-			$ef[ $tracker_id ] = array();
-			$extra_fields = $this->Taksboard->TrackersAdapter->getTasksTracker($tracker_id)->getExtraFields();
-			foreach( $extra_fields as $f) {
-				$ef[ $tracker_id ][ strtolower( $f['alias'] ) ] = $f;
-			}
-		}
-
-		$i=0;
-		foreach($lines as $line) {
-			$i++;
-			$line = trim( $line );
-			if( strpos( $line, '?' ) === 0 ) {
-				// condition
-				$line = trim( substr( $line,1 ) );
-				if( strpos( $line, '==' ) ) {
-					list($alias, $value) = explode('==', $line, 2);
-				} elseif ( strpos( $line, '!=' ) ) {
-					list($alias, $value) = explode('!=', $line, 2);
-				} else {
-					$alias = $line;
-					$value = NULL;
-				}
-			} elseif( strpos( $line, '=' )  ) {
-				list($alias, $value) = explode('=', $line, 2);
-			} else {
-				$this->setError(
-                                        sprintf( 'TaskBoardColumnSource: unrecognized rule in line %s', $i) 
-                                );
-				continue;
-			}
-
-			$alias = strtolower( trim($alias) );
-			$value = trim($value);
-
-			$field_exists = false;
-			foreach( $this->Taskboard->getUsedTrackersIds() as $tracker_id ) {
-				if( array_key_exists( $alias, $ef[ $tracker_id ] ) ) {
-					$field_exists = true;
-				}
-			}
-
-			if(!$field_exists) {
-				$this->setError(
-					sprintf( 'TaskBoardColumnSource: field %s is not found in any linked tracker (line %s)', $alias, $i) 
-				);
-			}
-		}
-
-		return $ret;
 	}
 
 	/**

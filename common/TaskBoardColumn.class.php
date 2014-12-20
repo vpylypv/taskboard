@@ -436,7 +436,7 @@ class TaskBoardColumn extends Error {
 	/**
          *
          */
-        function setDropRule($source_column_id, $target_resolution, $alert='', $autoassign=0, $set_rules='') {
+        function setDropRule($source_column_id, $target_resolution, $alert='', $autoassign=0) {
 		if( $source_column_id ) {
 			$rule = taskboard_column_source_get_object( $source_column_id, $this->getID() );
 		} else {
@@ -444,7 +444,7 @@ class TaskBoardColumn extends Error {
 		}
 
 		if( $rule ) {
-			$rule->save($target_resolution, $alert, $autoassign, $set_rules);
+			$rule->save($target_resolution, $alert, $autoassign);
 			if( $rule->isError() ) {
 				$this->setError( $rule->getErrorMessage() );	
 				return false;

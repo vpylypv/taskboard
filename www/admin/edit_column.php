@@ -37,10 +37,9 @@ if (getStringFromRequest('post_changes')) {
         $resolution_by_default =  getStringFromRequest('resolution_by_default','');
         $alert = getStringFromRequest('alert','');
         $autoassign = getIntFromRequest('autoassign',0);
-        $set_rules = getStringFromRequest('set_rules','');
 
         db_begin();
-        if( $column->setDropRule(NULL, $resolution_by_default, $alert, $autoassign, $set_rules) ) {
+        if( $column->setDropRule(NULL, $resolution_by_default, $alert, $autoassign) ) {
                 db_commit();
 		$feedback .= _('Succefully Updated');
         } else {
@@ -95,7 +94,6 @@ foreach( $taskboard->getAvailableResolutions() as $resolution ) {
 			<tr><td><strong><?php echo _('Drop resolution by default') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><select id="resolution_by_default" name="resolution_by_default"></select></td></tr>
 			<tr><td><strong><?php echo _('Autoassign') ?></strong></td><td><input type="checkbox" name="autoassign" value="1" <?php  echo $drop_rules_by_default->getAutoassign() ? 'checked' : '' ; ?>></td></tr>
 			<tr><td><strong><?php echo _('Alert message') ?></strong></td><td><textarea name="alert" cols="79" rows="5" ><?= htmlspecialchars($drop_rules_by_default->getAlertText()) ?></textarea></td></tr>
-			<tr><td><strong><?php echo _('Set rules') ?></strong></td><td><textarea name="set_rules" cols="79" rows="5" ><?= htmlspecialchars($drop_rules_by_default->getRules()) ?></textarea></td></tr>
                 </table>
 
 <p>

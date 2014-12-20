@@ -50,7 +50,6 @@ CREATE TABLE plugin_taskboard_columns_sources (
         source_taskboard_column_id integer REFERENCES plugin_taskboard_columns(taskboard_column_id) ON DELETE CASCADE,
 	target_resolution TEXT NOT NULL,
 	alert text,
-	autoassign integer NOT NULL DEFAULT 0,
-	set_rules text
+	autoassign integer NOT NULL DEFAULT 0
 );
 ALTER TABLE plugin_taskboard_columns_sources OWNER TO gforge;
