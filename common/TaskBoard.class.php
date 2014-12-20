@@ -630,6 +630,11 @@ class TaskBoard extends Error {
 			}
 		}
 
+		if( !$ret['user_story'] ) {
+			// task is not assigend to any user story
+			$ret['user_story'] = 0;
+		}
+
 		return $ret;
 	}
 
