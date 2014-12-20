@@ -79,7 +79,9 @@ if (!$group_id) {
 
 <link rel="stylesheet" type="text/css" href="/plugins/taskboard/css/agile-board.css">
 <script type="text/javascript" src="/plugins/taskboard/js/agile-board.js?<?= time() ?>"></script>
+<?php if ( function_exists( 'html_use_jqueryui' ) ) { html_use_jqueryui(); } else { ?>
 <script type="text/javascript" src="/plugins/taskboard/js/jquery-ui.js"></script>
+<?php } ?>
 <table id="agile-board">
 	<thead>
 		<tr valign="top">
