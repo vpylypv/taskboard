@@ -11,14 +11,18 @@ function showMessage( msg_text, msg_class) {
 function loadTaskboard( group_id ) {
 	jQuery('#agile-board tbody').html('');
 
+	var assigned_to = jQuery('select[name="_assigned_to"]').val();
+	var data = {
+                        action   : 'load_taskboard',
+                        group_id : group_id,
+			assigned_to : assigned_to
+        };
+
         jQuery.ajax({
                 type: 'POST',
                 url: '/plugins/taskboard/ajax.php',
                 dataType: 'json',
-                data : {
-                        action   : 'load_taskboard',
-                        group_id : group_id
-                },
+                data : data, 
                 async: false
         }).done(function( answer ) {
                         if(answer['message']) {
@@ -31,6 +35,11 @@ function loadTaskboard( group_id ) {
                         jQuery( "#agile-board" ).append(
                                 drawUserStories()
                         );
+
+			jQuery( ".agile-toolbar-add-task" ).click( function(e) {
+				alert( $(this).attr('user_story_id') );
+				e.preventDefault();	
+			});
 
                         for(var i=0 ; i<aUserStories.length ; i++) {
                                 drawUserStory( aUserStories[i] );
@@ -53,9 +62,11 @@ function drawUserStories() {
 			start=1;
 			l_sHtml += '<td class="agile-phase"><div class="agile-sticker-container">';
 			l_sHtml += '<div class="agile-sticker agile-sticker-user-story">';
-			l_sHtml += '<div class="agile-sticker-header"><a href="#">' + us.id + '</a> : <span>' + us.title + "</span></div>\n";
+			l_sHtml += '<div class="agile-sticker-header"><a href="#">' + us.id + '</a> : <span>' + us.title + "</span>";
+			l_sHtml += '<div style="float: right";>[<a href="" class="agile-toolbar-add-task" user_story_id="' +us.id+ '">+</a>]</div></div>\n';
 			l_sHtml += '<div class="agile-sticker-body">' + us.description + "</div>\n";
-			l_sHtml += "</div></td>\n";
+			l_sHtml += "</div>\n";
+			l_sHtml += "</td>\n";
 		}
 
 		for( var j=start; j<aPhases.length; j++) {
@@ -230,6 +241,10 @@ function drawTasks( oUserStory, sPhaseId ) {
 }
 
 function taskInPhase( tsk, phase ) {
+ 	if( tsk.phase_id ==  phase) {
+        	return true;
+        }
+
 	for( var i=0; i<aPhases.length; i++) {
 		if( aPhases[i].id == phase && aPhases[i].resolutions ) {
 			for( var j=0; j<aPhases[i].resolutions.length; j++) {

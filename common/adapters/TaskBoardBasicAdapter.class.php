@@ -75,7 +75,7 @@ class TaskBoardBasicAdapter {
 	/**
 	 * TODO - filters
 	 */
-	function getUserStories() {
+	function getUserStories($release=NULL) {
 		$at = $this->getUserStoriesTracker();
 		$af = new ArtifactFactory($at);
 		if (!$af || !is_object($af)) {
@@ -85,7 +85,7 @@ class TaskBoardBasicAdapter {
 		}
 
 		$_status = 1;
-		$af->setup(NULL,NULL,NULL,NULL,NULL,NULL,$_status,NULL);
+		$af->setup(NULL,NULL,NULL,NULL,'agileboard',NULL,$_status,NULL);
 
 		return $af->getArtifacts();
 	}
@@ -144,7 +144,7 @@ class TaskBoardBasicAdapter {
 	/**
 	 *
 	 */
-	function getTasks($tracker_id,$filter=NULL) {
+	function getTasks($tracker_id,$release=NULL,$assigned_to=NULL) {
 		$tasks = array();
 
 		$at = $this->getTasksTracker($tracker_id);
@@ -157,11 +157,11 @@ class TaskBoardBasicAdapter {
                 	}
 
 	                $_status = 1;
-        	        $af->setup(NULL,NULL,NULL,NULL,NULL,NULL,$_status,NULL);
+        	        $af->setup(NULL,NULL,NULL,NULL,'agileboard',$assigned_to,$_status,NULL);
 
                 	$tasks = $af->getArtifacts();
 		}
-		
+	
 		return $tasks;
 	}
 

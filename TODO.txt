@@ -8,9 +8,11 @@
 - DONE View - order user stories by priority (user story points)
 - View  - first column by default 
 - View - filter by assigned persons
+- View - auto ref rate support
+- Admin - auto ref rate support
 - Admin - adapters - coloring support
-- View - adapters - coloring support
-- View - colors by extrafield
+- View - adapters - coloring support (for GT)
+- View - colors by extrafield (for GT)
 - Admin - releases management
 - View - indicators - progress by tasks number
 - View - indicators - progress by tasks cost

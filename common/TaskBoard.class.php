@@ -494,7 +494,7 @@ class TaskBoard extends Error {
          *
          *      @return array
          */
-        function getUserStories( $release=NULL ) {
+        function getUserStories( $release=NULL, $assigned_to=NULL ) {
 		$stories=array(
 			'0' => array(
                 		'id' => 0,
@@ -517,7 +517,7 @@ class TaskBoard extends Error {
 			}
 		}
 
-		$us = $this->TrackersAdapter->getUserStories();
+		$us = $this->TrackersAdapter->getUserStories($release);
 		foreach( $us as $story) {
 			$stories[$story->getID()] = array(
 				'id' => $story->getID(),
@@ -539,7 +539,7 @@ class TaskBoard extends Error {
 	
 		$tasks_trackers = $this->getUsedTrackersData()	;
 		foreach( $tasks_trackers as $tasks_tracker_data ) {
-			$tasks = $this->TrackersAdapter->getTasks($tasks_tracker_data['group_artifact_id'], $release);
+			$tasks = $this->TrackersAdapter->getTasks($tasks_tracker_data['group_artifact_id'], $release,$assigned_to);
 			foreach( $tasks as $task ) {
 				$task_maped = $this->getMappedTask( $task );
 				$stories[intval($task_maped['user_story'])]['tasks'][] = $task_maped ;
@@ -554,6 +554,7 @@ class TaskBoard extends Error {
 
 	function getMappedTask( $task ) {
 		static $_used_trackers_data = NULL;
+		static $_first_column_id = NULL;
 
 		if( !$_used_trackers_data ) {
 			foreach(  $this->getUsedTrackersData() as $tasks_tracker_data) {
@@ -566,9 +567,15 @@ class TaskBoard extends Error {
                 if( $column ) {
 	                $task_maped['phase_id'] = $column->getID();
                 } else {
-        	        error_log( 'Column is not defined for resolution '.$task_maped['resolution'] );
+        	        error_log( 'Column is not defined for resolution '.$task_maped['resolution'].'(task '.$task->getID().')' );
                         if( $this->getFirstColumnByDefault() ) {
-                	        // TODO put this task into the first column
+				if( !$_first_column_id ) {
+					$columns = $this->getColumns();			
+					$_first_column_id = $columns[0]->getID();
+					error_log( 'Use column '.$_first_column_id.' as a first column by default');
+				}
+
+				$task_maped['phase_id'] = $_first_column_id;
                         }
                 }
 

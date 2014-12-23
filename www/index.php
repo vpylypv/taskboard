@@ -82,6 +82,43 @@ if (!$group_id) {
 <?php if ( function_exists( 'html_use_jqueryui' ) ) { html_use_jqueryui(); } else { ?>
 <script type="text/javascript" src="/plugins/taskboard/js/jquery-ui.js"></script>
 <?php } ?>
+
+<?php
+$techs = $group->getUsers();
+
+$_assigned_to = getIntFromRequest('_assigned_to','0');
+// stolen code from tracker
+$tech_id_arr = array () ;
+$tech_name_arr = array () ;
+
+foreach ($techs as $tech) {
+        $tech_id_arr[] = $tech->getID() ;
+        $tech_name_arr[] = $tech->getRealName() ;
+}
+$tech_id_arr[]='0';  //this will be the 'any' row
+$tech_name_arr[]=_('Any');
+
+if (is_array($_assigned_to)) {
+        $_assigned_to='';
+}
+$tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assigned_to',$_assigned_to,true,_('Unassigned'));
+// end of the stolen code
+
+?>
+
+
+<div class="tabbertab'.($af->query_type == 'custom' ? ' tabbertabdefault' : '').'" title="'._('Simple Filtering and Sorting').'">
+        <form action="'. getStringFromServer('PHP_SELF') .'?group_id='.$group_id.'&amp;atid='.$ath->getID().'" method="post">
+        <table width="100%" cellspacing="0">
+        <tr>
+        <td>
+        <?php echo _('Assignee').':&nbsp;'. $tech_box ; ?>
+        </td>
+        </tr>
+        </table>
+        </form>
+</div>
+
 <table id="agile-board">
 	<thead>
 		<tr valign="top">
@@ -113,7 +150,11 @@ aUserStories = [];
 aPhases = []
 
 jQuery( document ).ready(function( $ ) {
+	loadTaskboard( <?= $group_id ?> );
+
+	jQuery('select[name="_assigned_to"]').change(function () {
 		loadTaskboard( <?= $group_id ?> );
+	});
 });
 </script>
 <?php

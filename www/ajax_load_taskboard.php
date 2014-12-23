@@ -25,8 +25,14 @@ $ret = array();
 $columns = $taskboard->getColumns();
 $ret['message'] = '';
 
+$release = getIntFromRequest('release', NULL);
+$assigned_to = getIntFromRequest('assigned_to', NULL);
 
-$user_stories = $taskboard->getUserStories();
+if( !$assigned_to ) {
+	$assigned_to = NULL;
+}
+
+$user_stories = $taskboard->getUserStories($release, $assigned_to);
 $user_stories_tracker = $taskboard->getUserStoriesTrackerID();
 $phases = array();
 if( $user_stories_tracker ) {
