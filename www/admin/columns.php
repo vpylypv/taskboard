@@ -44,6 +44,10 @@ $taskboard->header(
 	)
 );
 
+if( count( $taskboard->getUsedTrackersIds() ) == 0 ) {
+	exit_error( _('Choose at least one tracker for using with taskboard.') );
+}
+
 if( $taskboard->isError() ) {
 	echo '<div id="messages" class="error">'.$taskboard->getErrorMessage().'</div>';
 } else {

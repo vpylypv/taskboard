@@ -69,10 +69,14 @@ if (!$group_id) {
 		)
 	);
 
-
         if( $taskboard->isError() ) {
 		exit_error($taskboard->getErrorMessage());
 	} else {
+
+		if( count( $taskboard->getUsedTrackersIds() ) == 0 ) {
+		        exit_error( _('Choose at least one tracker for using with taskboard.') );
+		}
+
 		$columns = $taskboard->getColumns();
 		$user_stories_tracker = $taskboard->getUserStoriesTrackerID();
 		$columns_number = count($columns) + ( $user_stories_tracker ? 1 : 0 );

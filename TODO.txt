@@ -6,8 +6,8 @@
 - DONE Admin - first column by default (checkbox - put all cards with undefined resolution into column by default)
 - DONE View - order tasks by priority
 - DONE View - order user stories by priority (user story points)
-- View  - first column by default 
-- View - filter by assigned persons
+- DONE View  - first column by default 
+- DONE View - filter by assigned persons
 - View - auto ref rate support
 - Admin - auto ref rate support
 - Admin - adapters - coloring support
@@ -18,3 +18,4 @@
 - View - indicators - progress by tasks cost
 - View - indicators - burndown chart
 - View - indicators - velocity calculation
+- Improve taskboard initialization - columns by default?

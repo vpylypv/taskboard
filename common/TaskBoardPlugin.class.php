@@ -43,20 +43,22 @@ class TaskBoardPlugin extends Plugin {
 			}
 		} elseif ($hookname == "groupmenu") {
                         $group_id=$params['group'];
-                        $project = group_get_object($group_id);
-                        if (!$project || !is_object($project))
+                        $group = group_get_object($group_id);
+                        if (!$group || !is_object($group))
                                 return;
-                        if ($project->isError())
+                        if ($group->isError())
                                 return;
-                        if (!$project->isProject())
+                        if (!$group->isProject())
                                 return;
-                                
-			$params['TITLES'][] = _("Task Board");
-                        $params['DIRS'][] = '/plugins/taskboard/index.php?group_id=' . $project->getID()  ;
+                          
+			if( $group->usesPlugin ( $this->name ) ) {     
+				$params['TITLES'][] = _("Task Board");
+        	                $params['DIRS'][] = '/plugins/taskboard/index.php?group_id=' . $group->getID()  ;
 		
-			if($params['toptab'] == $this->name) {
-          			$params['selected']=array_search($this->text,$params['TITLES']);
-        		}
+				if($params['toptab'] == $this->name) {
+        	  			$params['selected']=array_search($this->text,$params['TITLES']);
+        			}
+			}
                 }
 	}
 

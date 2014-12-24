@@ -44,6 +44,21 @@ function &taskboard_get_object($taskboard_id,$data=false) {
         return $Taskboard;
 }
 
+/**
+ * Initialize a task board
+ */
+function &taskboard_init($group_id) {
+	$res = db_query_params ('INSERT INTO plugin_taskboard(group_id) VALUES($1)', array ($group_id)) ;
+        if ( !$res ) {
+                return false;
+        }
+
+	$Group = group_get_object($data["group_id"]);
+
+        $Taskboard = new TaskBoard($Group,$data);
+        return $Taskboard;
+}
+
 
 class TaskBoard extends Error {
         /**
@@ -97,6 +112,7 @@ class TaskBoard extends Error {
 			$plugins_taskboard_trackers_adapter_module = $gfplugins.'taskboard/common/adapters/TaskBoardBasicAdapter.class.php';
 			$plugins_taskboard_trackers_adapter_class  = 'TaskBoardBasicAdapter';			
 		}
+
 		require_once( $plugins_taskboard_trackers_adapter_module );
 		$this->TrackersAdapter = new $plugins_taskboard_trackers_adapter_class( $this );
 	}

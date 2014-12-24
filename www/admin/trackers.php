@@ -37,7 +37,7 @@ if (!$atf || !is_object($atf) || $atf->isError()) {
 }
 
 $at_arr = $atf->getArtifactTypes();
-if ($at_arr === false) {
+if ($at_arr === false || !count($at_arr) ) {
 	exit_error(_('There Are No Trackers Defined For This Project'));
 }
 
