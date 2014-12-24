@@ -143,6 +143,11 @@ $tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assig
 	</tbody>
 </table>
 
+
+<div id="new-task-dialog" style="dsplay: none;">
+
+</div>
+
 <script>
 var gGroupId = <?= $group_id ?>;
 bShowUserStories = <?= $taskboard->getUserStoriesTrackerID() ? 'true' : 'false' ?>;
@@ -154,6 +159,25 @@ jQuery( document ).ready(function( $ ) {
 
 	jQuery('select[name="_assigned_to"]').change(function () {
 		loadTaskboard( <?= $group_id ?> );
+	});
+
+
+	jQuery('#new-task-dialog').dialog(
+	{
+		autoOpen: false,
+		height: 300,
+		width: 350,
+		modal: true,
+		buttons: {
+			"<?= _("Create task") ?>" : function () {
+				alert(1);
+			},
+			"<?= _("Cancel") ?>" : function() {
+				jQuery('#new-task-dialog').dialog( "close" );
+			}
+		},
+		close: function() {
+		}
 	});
 });
 </script>

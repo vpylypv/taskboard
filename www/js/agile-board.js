@@ -9,8 +9,6 @@ function showMessage( msg_text, msg_class) {
 }
 
 function loadTaskboard( group_id ) {
-	jQuery('#agile-board tbody').html('');
-
 	var assigned_to = jQuery('select[name="_assigned_to"]').val();
 	var data = {
                         action   : 'load_taskboard',
@@ -25,6 +23,8 @@ function loadTaskboard( group_id ) {
                 data : data, 
                 async: false
         }).done(function( answer ) {
+			 jQuery('#agile-board tbody').html('');
+
                         if(answer['message']) {
                                 showMessage(answer['message'], 'error');
                         }
@@ -37,7 +37,9 @@ function loadTaskboard( group_id ) {
                         );
 
 			jQuery( ".agile-toolbar-add-task" ).click( function(e) {
-				alert( $(this).attr('user_story_id') );
+//alert( jQuery(this).attr('user_story_id'));
+				jQuery('#new-task-dialog').dialog('open');
+				jQuery('.ui-widget-overlay').height( jQuery( document ).height() );
 				e.preventDefault();	
 			});
 

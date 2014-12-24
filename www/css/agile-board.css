@@ -79,3 +79,38 @@
   background-color: #EEEEEE;
   opacity: 0.75;
 }
+
+.ui-dialog {
+	z-index: 2000;
+	background-color: #ffffcc;
+	border: 1px solid grey;
+}
+
+.ui-dialog-titlebar {
+	display: none;
+}
+
+.ui-dialog-buttonpane {
+	padding: 2px 5px;
+	height: 30px;
+}
+
+.ui-dialog-buttonset {
+	float: right;
+}
+
+.ui-helper-clearfix:after {
+	clear: both;
+	display: block;
+}
+
+.ui-widget-overlay {
+	opacity: 0.5;
+	height: 100%;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index: 1001;
+	background-color: #aaaaaa;
+}
