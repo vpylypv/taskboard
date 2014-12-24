@@ -28,9 +28,3 @@ $taskboardPluginObject = new TaskBoardPlugin ;
 
 register_plugin ($taskboardPluginObject) ;
 
-// Local Variables:
-// mode: php
-// c-file-style: "bsd"
-// End:
-
-?>

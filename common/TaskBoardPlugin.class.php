@@ -63,9 +63,3 @@ class TaskBoardPlugin extends Plugin {
 
 }
 
-// Local Variables:
-// mode: php
-// c-file-style: "bsd"
-// End:
-
-?>

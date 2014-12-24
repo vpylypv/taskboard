@@ -175,6 +175,35 @@ class TaskBoardBasicAdapter {
 	/**
          *
          */
+        function createTask( $tracker_id, $title, $description, $user_story_id=null, $user_story_alias=null ) {
+
+		$tracker = $this->getTasksTracker($tracker_id);
+                if( $tracker ) {
+			$artifact = new Artifact( $tracker );
+
+			$extra_fields = array();
+
+			if($user_story_id && $user_story_alias ) {
+				$fields = $this->getFieldsIds($tracker_id);
+				if( array_key_exists($user_story_alias, $fields) ) {
+					$extra_fields[ $fields[ $user_story_alias ] ] = $user_story_id;
+				}
+			}
+
+			$ret = $artifact->create($title,$description, null, null, $extra_fields);
+
+			if( !$ret ) {
+	                        return $artifact->getErrorMessage();
+        	        }
+                }
+		
+		return '';		
+	}
+	
+
+	/**
+         *
+         */
         function updateTask(&$artifact, $assigned_to, $resolution, $title=NULL, $description=NULL ) {
 
 		if( !$assigned_to ) {
@@ -224,10 +253,12 @@ class TaskBoardBasicAdapter {
 
 		return '';
 	}
-}
-// Local Variables:
-// mode: php
-// c-file-style: "bsd"
-// End:
 
-?>
+	/**
+         *
+         */
+        function getTaskUrl( $artifact ) {
+		return util_make_url ('/tracker/?aid='.$artifact->getID().'&amp;atid='.$artifact->ArtifactType->getID().'&amp;group_id='.$artifact->ArtifactType->Group->getID().'&amp;func=detail');
+	}
+}
+

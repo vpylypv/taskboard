@@ -80,6 +80,14 @@
   opacity: 0.75;
 }
 
+#new-task-dialog div {
+	margin: 7px;
+}
+
+#new-task-dialog input, #new-task-dialog textarea {
+	width: 98%;
+}
+
 .ui-dialog {
 	z-index: 2000;
 	background-color: #ffffcc;

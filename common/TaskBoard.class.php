@@ -500,7 +500,8 @@ class TaskBoard extends Error {
                 		'id' => 0,
 		                'title' => _('Unlinked tasks'),
                 		'description' => _('Tasks, which are not linked to any user story'),
-		                'tasks' => array()
+		                'tasks' => array(),
+				'url' => '#'
 		        )
 		);
 
@@ -524,7 +525,8 @@ class TaskBoard extends Error {
 				'title' => $story->getSummary(),
 				'description' => $story->getDetails(),
 				'priority' => $story->getPriority(),
-				'tasks' => array()
+				'tasks' => array(),
+				'url' => $this->TrackersAdapter->getTaskUrl($story)
 			);
 
 			if( $user_stories_sort_extra_field_id ) {
@@ -628,7 +630,7 @@ class TaskBoard extends Error {
 		$ret['description'] = str_replace("\n", '<br>', $task->getDetails() );
 		$ret['assigned_to'] = $task->getAssignedRealName();
 		$ret['priority'] = $task->getPriority();
-		foreach( array( 'resolution', 'estimated_dev_effort', 'remaining_estimated_effort', 'user_story') as $f){
+		foreach( array( 'resolution', 'estimated_dev_effort', 'remaining_estimated_effort', $us_ref_field) as $f){
 			$ret[$f] = '';
 			if( array_key_exists( $f, $fields_ids ) ) {
 				if( array_key_exists( $fields_ids[$f], $extra_data ) ) {
@@ -641,6 +643,8 @@ class TaskBoard extends Error {
 			// task is not assigend to any user story
 			$ret['user_story'] = 0;
 		}
+
+		$ret['url'] = $this->TrackersAdapter->getTaskUrl( $task );
 
 		return $ret;
 	}
@@ -752,9 +756,3 @@ class TaskBoard extends Error {
 
 }
 
-// Local Variables:
-// mode: php
-// c-file-style: "bsd"
-// End:
-
-?>

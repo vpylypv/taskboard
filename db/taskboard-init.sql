@@ -8,7 +8,7 @@ CREATE TABLE plugin_taskboard (
 	user_stories_reference_field_alias text,
         user_stories_sort_field_alias text,
         user_stories_group_artifact_id integer,
-	first_column_by_default integer NOT NULL default 1,
+	first_column_by_default integer NOT NULL default 1
 );
 ALTER TABLE public.plugin_taskboard OWNER TO gforge;
 

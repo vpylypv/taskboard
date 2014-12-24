@@ -22,7 +22,12 @@
 
 require_once dirname(__FILE__)."/../../env.inc.php";
 require_once $gfcommon.'include/pre.php';
-require_once $gfconfig.'plugins/taskboard/config.php' ;
+
+if( file_exists( $gfconfig.'plugins/taskboard/config.php' ) ) {
+	require_once $gfconfig.'plugins/taskboard/config.php' ;
+} else {
+	exit_error(_('Configuration file is missing for taskboard plugin'),'home');
+}
 
 global $gfplugins;
 require_once $gfplugins.'taskboard/www/include/TaskBoardHtml.class.php';
@@ -37,7 +42,6 @@ if (!$user || !is_object($user) ) {
 } else if ( !$user->isActive()) {
 	exit_error(_('Invalid User : Not active'),'home');
 }
-
 
 $pluginname = 'taskboard';
 $group_id = getStringFromRequest('group_id');
@@ -55,6 +59,7 @@ if (!$group_id) {
 
 
 	$taskboard = new TaskBoardHtml( $group ) ;
+
 	$taskboard->header(
 		array(
 			'title'=>'Taskboard for '.$group->getPublicName(),
@@ -78,7 +83,7 @@ if (!$group_id) {
 <br/>
 
 <link rel="stylesheet" type="text/css" href="/plugins/taskboard/css/agile-board.css">
-<script type="text/javascript" src="/plugins/taskboard/js/agile-board.js?<?= time() ?>"></script>
+<script type="text/javascript" src="/plugins/taskboard/js/agile-board.js?<?php echo time() ?>"></script>
 <?php if ( function_exists( 'html_use_jqueryui' ) ) { html_use_jqueryui(); } else { ?>
 <script type="text/javascript" src="/plugins/taskboard/js/jquery-ui.js"></script>
 <?php } ?>
@@ -124,7 +129,7 @@ $tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assig
 		<tr valign="top">
 
 		<?php if( $user_stories_tracker ) { ?>
-			<td class="agile-phase-title" style="width: <?= $column_width ?>%;"><?=  _('User stories')?></td>
+			<td class="agile-phase-title" style="width: <?php echo $column_width ?>%;"><?php echo  _('User stories')?></td>
 		<?php } ?>
 
 		<?php foreach( $columns as $column ) { ?>
@@ -135,7 +140,7 @@ $tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assig
 				$style .= 'background-color: ' . $title_bg_color . ';';
 			}
 		?>
-			<td class="agile-phase-title" style="<?= $style ?>"><?= $column->getTitle() ?></td>
+			<td class="agile-phase-title" style="<?php echo $style ?>"><?php echo $column->getTitle() ?></td>
 		<?php } ?>
 		</tr>
 	</thead>
@@ -144,39 +149,116 @@ $tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assig
 </table>
 
 
-<div id="new-task-dialog" style="dsplay: none;">
+<div id="new-task-dialog" style="display: none;">
+	<input type="hidden" name="user_story_id" id="user_story_id" value="">
+	<?php
+		$used_trackers = $taskboard->getUsedTrackersIds();
 
+		if( count($used_trackers) == 1 ) {
+			echo '<input type="hidden" name="tracker_id" id="tracker_id" value="' . $at_arr[0]->getID(). '">';
+		} else {
+			// select target tracker if more then single trackers are configured
+			echo "<div>\n";
+			echo '<select name="tracker_id" id="tracker_id">';
+			foreach( $used_trackers as $tracker_id ) {
+				$tracker = $taskboard->TrackersAdapter->getTasksTracker($tracker_id);
+				echo '<option value="'.$tracker->getID().'">' . $tracker->getName() . '</option>';
+			}	
+			echo '</select>';
+			echo "</div>\n";
+		}
+	?>
+
+
+
+	<div>
+		 <strong><?php echo _('Summary')?><?php echo utils_requiredField(); ?>:</strong><br />
+                <input id="tracker-summary" title="<?php echo util_html_secure(_('The summary text-box represents a short tracker item summary. Useful when browsing through several tracker items.')) ?>" type="text" name="summary" size="70" value="" maxlength="255" />	
+	</div>
+
+	<div>
+		<strong><?php echo _('Detailed description') ?><?php echo utils_requiredField(); ?>: </strong>
+                <br />
+                <textarea id="tracker-description" name="description" rows="10" cols="79" title="<?php echo util_html_secure(html_get_tooltip_description('description')) ?>"></textarea>
+	</div>
 </div>
 
 <script>
-var gGroupId = <?= $group_id ?>;
-bShowUserStories = <?= $taskboard->getUserStoriesTrackerID() ? 'true' : 'false' ?>;
+var gGroupId = <?php echo $group_id ?>;
+bShowUserStories = <?php echo $taskboard->getUserStoriesTrackerID() ? 'true' : 'false' ?>;
 aUserStories = [];
 aPhases = []
 
 jQuery( document ).ready(function( $ ) {
-	loadTaskboard( <?= $group_id ?> );
+	loadTaskboard( <?php echo $group_id ?> );
 
 	jQuery('select[name="_assigned_to"]').change(function () {
-		loadTaskboard( <?= $group_id ?> );
+		loadTaskboard( <?php echo $group_id ?> );
 	});
 
 
 	jQuery('#new-task-dialog').dialog(
 	{
 		autoOpen: false,
-		height: 300,
 		width: 350,
 		modal: true,
-		buttons: {
-			"<?= _("Create task") ?>" : function () {
-				alert(1);
+		buttons: [
+			{
+				text : "<?php echo _("Create task") ?>",
+				id: "new-task-dialog-submit-button",
+				click : function () {
+					jQuery.ajax({
+                                                                type: 'POST',
+                                                                url: '<?php echo util_make_url('/plugins/taskboard/ajax.php') ;?>',
+                                                                dataType: 'json',
+                                                                data : {
+                                                                        action   : 'add',
+									group_id : gGroupId,
+                                                                        tracker_id : jQuery('#tracker_id').val(),
+									user_story_id : jQuery('#user_story_id').val(), 
+                                                                        title : jQuery('#tracker-summary').val(),
+									desc : jQuery('#tracker-description').val() 
+                                                                },
+                                                                async: true
+                                                        }).done(function( answer ) {
+								jQuery('#new-task-dialog').dialog( "close" );
+
+                                                                if(answer['message']) {
+                                                                        showMessage(answer['message'], 'error');
+                                                                }
+
+                                                                if(answer['action'] == 'reload') {
+                                                                        // reload whole board
+                                                                        loadTaskboard( gGroupId );
+                                                                }
+                                                        }).fail(function( jqxhr, textStatus, error ) {
+                                                                var err = textStatus + ', ' + error;
+                                                                alert(err);
+                                                        });
+				}
 			},
-			"<?= _("Cancel") ?>" : function() {
-				jQuery('#new-task-dialog').dialog( "close" );
+			{
+				text : "<?php echo _("Cancel") ?>",
+				click: function() {
+					jQuery('#new-task-dialog').dialog( "close" );
+				}
 			}
-		},
+		],
 		close: function() {
+		},
+		open: function () {
+			jQuery('#new-task-dialog-submit-button').prop( "disabled", true );
+			jQuery('#tracker-summary').val('');
+			jQuery('#tracker-description').val('');
+		}
+	});
+
+	jQuery('#tracker-summary, #tracker-description').keyup( function () {
+		// submit button is enabled only if both, title and descritpion, are filled
+		if( jQuery('#tracker-summary').val() && jQuery('#tracker-description').val()) {
+			jQuery('#new-task-dialog-submit-button').prop( "disabled", false );
+		} else {
+			jQuery('#new-task-dialog-submit-button').prop( "disabled", true );
 		}
 	});
 });
@@ -187,4 +269,3 @@ jQuery( document ).ready(function( $ ) {
 
 site_project_footer(array());
 
-?>

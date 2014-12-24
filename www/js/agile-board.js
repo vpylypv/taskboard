@@ -37,7 +37,7 @@ function loadTaskboard( group_id ) {
                         );
 
 			jQuery( ".agile-toolbar-add-task" ).click( function(e) {
-//alert( jQuery(this).attr('user_story_id'));
+				jQuery('#new-task-dialog input[name="user_story_id"]').val( jQuery(this).attr('user_story_id') );
 				jQuery('#new-task-dialog').dialog('open');
 				jQuery('.ui-widget-overlay').height( jQuery( document ).height() );
 				e.preventDefault();	
@@ -64,7 +64,7 @@ function drawUserStories() {
 			start=1;
 			l_sHtml += '<td class="agile-phase"><div class="agile-sticker-container">';
 			l_sHtml += '<div class="agile-sticker agile-sticker-user-story">';
-			l_sHtml += '<div class="agile-sticker-header"><a href="#">' + us.id + '</a> : <span>' + us.title + "</span>";
+			l_sHtml += '<div class="agile-sticker-header"><a href="' + us.url + '" target="_blank">' + us.id + '</a> : <span>' + us.title + "</span>";
 			l_sHtml += '<div style="float: right";>[<a href="" class="agile-toolbar-add-task" user_story_id="' +us.id+ '">+</a>]</div></div>\n';
 			l_sHtml += '<div class="agile-sticker-body">' + us.description + "</div>\n";
 			l_sHtml += "</div>\n";
@@ -232,7 +232,7 @@ function drawTasks( oUserStory, sPhaseId ) {
 			l_sHtml += '<div class="agile-sticker-container">';
         	        l_sHtml += '<div class="agile-sticker agile-sticker-task agile-sticker-task-' + tsk.user_story + '" id="task-' + tsk.id + '" >';
                 	l_sHtml += '<div class="agile-sticker-header" style="background-color: ' + tsk.background + ';">';
-	                l_sHtml += '<a href="#">' + tsk.id + '</a> : <span>' + tsk.title + '</span>';
+	                l_sHtml += '<a href="' + tsk.url  +  '" target="_blank">' + tsk.id + '</a> : <span>' + tsk.title + '</span>';
         	        l_sHtml += "</div>\n";
                 	l_sHtml += '<div class="agile-sticker-body">' + tsk.description + '</div>';
  			l_sHtml += "</div></div>\n";
@@ -273,7 +273,7 @@ function initEditable() {
                         var l_nTaskId = jQuery(this).parent().parent().data('task_id');
 
 			jQuery(this).html( '<input id="text_title" name="title" type="text">');
-			jQuery('#text_title').val( l_sTitle ).css('width', '90%').focus().focusout(function() {
+			jQuery('#text_title').val( l_sTitle ).css('width', '80%').focus().focusout(function() {
 				l_oTitle.text( l_sTitle );
 			}) ;
 
@@ -334,7 +334,7 @@ function initEditable() {
 			jQuery(this).html( '<textarea id="text_description" name="description" rows="11"></textarea>');
 
 			
-			jQuery('#text_description').text( l_sDescription.replace(/<br>/g, "\n") ).css('width', '98%').css('height', '95%').focus().focusout(function() {
+			jQuery('#text_description').html( l_sDescription.replace(/<br>/g, "\n") ).css('width', '98%').css('height', '95%').focus().focusout(function() {
 	 l_oDesc.html( l_sDescription );
 }) ;
 			jQuery('#text_description').keydown(function(e) {
@@ -367,7 +367,7 @@ function initEditable() {
                                                                         loadTaskboard( gGroupId );
                                                                 }
 
-								l_oDesc.html(jQuery(textField).val().replace(/\n/g, '<br>') );
+								l_oDesc.text(jQuery(textField).val() );
                                                         }).fail(function( jqxhr, textStatus, error ) {
 								var err = textStatus + ', ' + error;
 								alert(err);

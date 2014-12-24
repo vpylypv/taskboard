@@ -273,9 +273,3 @@ class TaskBoardColumnSource extends Error {
 	}
 }
 
-// Local Variables:
-// mode: php
-// c-file-style: "bsd"
-// End:
-
-?>
