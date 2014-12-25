@@ -27,12 +27,12 @@ require_once $gfcommon.'tracker/ArtifactFactory.class.php';
 require_once $gfcommon.'tracker/ArtifactExtraField.class.php';
 
 class TaskBoardBasicAdapter {
-        /**
-         * The TaskBoard object.
-         *
-         * @var         object  $TaskBoard.
-         */
-        var $TaskBoard; //taskboard object
+	/**
+	 * The TaskBoard object.
+	 *
+	 * @var         object  $TaskBoard.
+	 */
+	var $TaskBoard; //taskboard object
 
 	var $_atf=NULL; // artifact trackers factory
 	var $_ust=NULL; // user stories tracker
@@ -41,36 +41,36 @@ class TaskBoardBasicAdapter {
 	var $_res=array(); // hash os resolution values element_id => element_name
 
 	function TaskBoardBasicAdapter($TaskBoard) {
-                $this->TaskBoard = $TaskBoard;
+		$this->TaskBoard = $TaskBoard;
 	}
 
 
 	/**
-         * TODO - filters
-         */
-        function getArtifactTypeFactory() {
+	 * TODO - filters
+	 */
+	function getArtifactTypeFactory() {
 		if( !$this->_atf ) {
 			$this->_atf = new ArtifactTypeFactory($this->TaskBoard->Group); 
 		}
 
 		return $this->_atf;
-        }
+	}
 
 	function getUserStoriesTracker() {
 		if( !$this->_ust ) {
-                        $this->_ust = new ArtifactType($this->TaskBoard->Group, $this->TaskBoard->getUserStoriesTrackerID() );
-                }
+			$this->_ust = new ArtifactType($this->TaskBoard->Group, $this->TaskBoard->getUserStoriesTrackerID() );
+		}
 
-                return $this->_ust;
+		return $this->_ust;
 	}
 
 	function getTasksTracker($tracker_id) {
-                if( !array_key_exists($tracker_id, $this->_tt) ) {
-                        $this->_tt[$tracker_id] = new ArtifactType($this->TaskBoard->Group, $tracker_id );
-                }
+		if( !array_key_exists($tracker_id, $this->_tt) ) {
+			$this->_tt[$tracker_id] = new ArtifactType($this->TaskBoard->Group, $tracker_id );
+		}
 
-                return $this->_tt[$tracker_id];
-        }
+		return $this->_tt[$tracker_id];
+	}
 
 	/**
 	 * TODO - filters
@@ -79,9 +79,9 @@ class TaskBoardBasicAdapter {
 		$at = $this->getUserStoriesTracker();
 		$af = new ArtifactFactory($at);
 		if (!$af || !is_object($af)) {
-		        exit_error('Error','Could Not Get Factory');
+			exit_error('Error','Could Not Get Factory');
 		} elseif ($af->isError()) {
-        		exit_error('Error',$af->getErrorMessage());
+			exit_error('Error',$af->getErrorMessage());
 		}
 
 		$_status = 1;
@@ -103,43 +103,41 @@ class TaskBoardBasicAdapter {
 		);
 
 		if( !array_key_exists($tracker_id, $this->_fields) ) {
-                        $at = $this->getTasksTracker($tracker_id);
+			$at = $this->getTasksTracker($tracker_id);
 
 			$extra_fields = $at->getExtraFields();
 			foreach($extra_fields as $f) {
-			//	if( array_key_exists( $f['alias'], $ret ) ) {
-					$ret[ $f['alias'] ] = $f['extra_field_id'];
-			//	}
-			}					
+				$ret[ $f['alias'] ] = $f['extra_field_id'];
+			}
 			$this->_fields[$tracker_id] = $ret;
-                }
+		}
 
 		return $this->_fields[$tracker_id];
 	}
 
 	/**
-         *
-         */
-        function getResolutionValues($tracker_id) {
-                $ret = array();
+	 *
+	 */
+	function getResolutionValues($tracker_id) {
+		$ret = array();
 
-                if( !array_key_exists($tracker_id, $this->_res) ) {
-                        $at = $this->getTasksTracker($tracker_id);
+		if( !array_key_exists($tracker_id, $this->_res) ) {
+			$at = $this->getTasksTracker($tracker_id);
 
-                        $extra_fields = $at->getExtraFields();
-                        foreach($extra_fields as $f) {
-                                if( $f['alias'] == 'resolution' ) {
+			$extra_fields = $at->getExtraFields();
+			foreach($extra_fields as $f) {
+				if( $f['alias'] == 'resolution' ) {
 					$ef = new ArtifactExtraField($at, $f);
 					foreach( $ef->getAvailableValues() as $v) {
 						$ret[ $v['element_name'] ] = $v['element_id'];
 					}
 					$this->_res[$tracker_id] = $ret;
-                                }
-                        }
-                }
+				}
+			}
+		}
 
-                return array_keys( $this->_res[$tracker_id] );
-        }
+		return array_keys( $this->_res[$tracker_id] );
+	}
 
 	/**
 	 *
@@ -150,35 +148,34 @@ class TaskBoardBasicAdapter {
 		$at = $this->getTasksTracker($tracker_id);
 		if( $at ) {
 			$af = new ArtifactFactory($at);
-	                if (!$af || !is_object($af)) {
-        	                exit_error('Error','Could Not Get Factory');
-                	} elseif ($af->isError()) {
-                        	exit_error('Error',$af->getErrorMessage());
-                	}
+			if (!$af || !is_object($af)) {
+				exit_error('Error','Could Not Get Factory');
+			} elseif ($af->isError()) {
+				exit_error('Error',$af->getErrorMessage());
+			}
 
-	                $_status = 1;
-        	        $af->setup(NULL,NULL,NULL,NULL,'agileboard',$assigned_to,$_status,NULL);
+			$_status = 1;
+			$af->setup(NULL,NULL,NULL,NULL,'agileboard',$assigned_to,$_status,NULL);
 
-                	$tasks = $af->getArtifacts();
+			$tasks = $af->getArtifacts();
 		}
-	
+
 		return $tasks;
 	}
 
 	/**
-         *
-         */
-        function getTask( $task_id ) {
-                return artifact_get_object( $task_id );
+	 *
+	 */
+	function getTask( $task_id ) {
+		return artifact_get_object( $task_id );
 	}
 
 	/**
-         *
-         */
-        function createTask( $tracker_id, $title, $description, $user_story_id=null, $user_story_alias=null ) {
-
+	 *
+	 */
+	function createTask( $tracker_id, $title, $description, $user_story_id=null, $user_story_alias=null ) {
 		$tracker = $this->getTasksTracker($tracker_id);
-                if( $tracker ) {
+		if( $tracker ) {
 			$artifact = new Artifact( $tracker );
 
 			$extra_fields = array();
@@ -193,19 +190,18 @@ class TaskBoardBasicAdapter {
 			$ret = $artifact->create($title,$description, null, null, $extra_fields);
 
 			if( !$ret ) {
-	                        return $artifact->getErrorMessage();
-        	        }
-                }
+				return $artifact->getErrorMessage();
+			}
+		}
 		
-		return '';		
+		return '';
 	}
 	
 
 	/**
-         *
-         */
-        function updateTask(&$artifact, $assigned_to, $resolution, $title=NULL, $description=NULL ) {
-
+	 *
+	 */
+	function updateTask(&$artifact, $assigned_to, $resolution, $title=NULL, $description=NULL ) {
 		if( !$assigned_to ) {
 			$assigned_to = $artifact->getAssignedTo();
 		}
@@ -213,19 +209,19 @@ class TaskBoardBasicAdapter {
 		$tracker_id = $artifact->ArtifactType->getID();
 		$extra_fields = $artifact->getExtraFieldData();
 
-                if( !array_key_exists($tracker_id, $this->_res) ) {
-                        $this->getResolutionValues($tracker_id);
-                }
+		if( !array_key_exists($tracker_id, $this->_res) ) {
+			$this->getResolutionValues($tracker_id);
+		}
 
-                $fields_ids = $this->getFieldsIds( $tracker_id );
+		$fields_ids = $this->getFieldsIds( $tracker_id );
 
-                if( array_key_exists( 'resolution', $fields_ids ) ) {
-                        $resolution_field_id = $fields_ids['resolution'];
+		if( array_key_exists( 'resolution', $fields_ids ) ) {
+			$resolution_field_id = $fields_ids['resolution'];
 
 			if( array_key_exists( $resolution, $this->_res[$tracker_id] ) ){
 				$extra_fields[ $resolution_field_id ] = $this->_res[$tracker_id][$resolution]; 
 			}
-                }
+		}
 
 		if( !$title ) {
 			$title = htmlspecialchars_decode( $artifact->getSummary() );
@@ -238,12 +234,12 @@ class TaskBoardBasicAdapter {
 		$ret = $artifact->update(
 			$artifact->getPriority(),
 			$artifact->getStatusId(),
-                	$assigned_to,
+			$assigned_to,
 			$title,
 			100,
 			'',
 			$tracker_id,
-                	$extra_fields,
+			$extra_fields,
 			$description
 			);
 
@@ -255,9 +251,9 @@ class TaskBoardBasicAdapter {
 	}
 
 	/**
-         *
-         */
-        function getTaskUrl( $artifact ) {
+	 *
+	 */
+	function getTaskUrl( $artifact ) {
 		return util_make_url ('/tracker/?aid='.$artifact->getID().'&amp;atid='.$artifact->ArtifactType->getID().'&amp;group_id='.$artifact->ArtifactType->Group->getID().'&amp;func=detail');
 	}
 }

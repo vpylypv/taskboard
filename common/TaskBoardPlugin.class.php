@@ -30,7 +30,7 @@ class TaskBoardPlugin extends Plugin {
 		$this->hooks[] = "project_admin_plugins"; // to show up in the admin page fro group
 		$this->hooks[] = "groupmenu";
 		$this->hooks[] = "groupisactivecheckbox" ; // The "use ..." checkbox in editgroupinfo
-                $this->hooks[] = "groupisactivecheckboxpost" ; //
+		$this->hooks[] = "groupisactivecheckboxpost" ; //
 	}
 
 	function CallHook ($hookname, &$params) {
@@ -42,26 +42,25 @@ class TaskBoardPlugin extends Plugin {
 				echo '<p><a href="/plugins/taskboard/admin/index.php?group_id=' . $group->getID() . '">' . _("Task Board Admin") . '</a></p>';
 			}
 		} elseif ($hookname == "groupmenu") {
-                        $group_id=$params['group'];
-                        $group = group_get_object($group_id);
-                        if (!$group || !is_object($group))
-                                return;
-                        if ($group->isError())
-                                return;
-                        if (!$group->isProject())
-                                return;
-                          
+			$group_id=$params['group'];
+			$group = group_get_object($group_id);
+			if (!$group || !is_object($group))
+				return;
+			if ($group->isError())
+				return;
+			if (!$group->isProject())
+				return;
+
 			if( $group->usesPlugin ( $this->name ) ) {     
 				$params['TITLES'][] = _("Task Board");
-        	                $params['DIRS'][] = '/plugins/taskboard/index.php?group_id=' . $group->getID()  ;
+				$params['DIRS'][] = '/plugins/taskboard/index.php?group_id=' . $group->getID()  ;
 		
 				if($params['toptab'] == $this->name) {
-        	  			$params['selected']=array_search($this->text,$params['TITLES']);
-        			}
+					$params['selected']=array_search($this->text,$params['TITLES']);
+				}
 			}
-                }
+		}
 	}
-
 
 }
 

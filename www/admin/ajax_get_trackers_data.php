@@ -32,11 +32,11 @@ $ret = array( 'messages' => '', 'data' => array() );
 $at_arr = $atf->getArtifactTypes();
 for ($j = 0; $j < count($at_arr); $j++) {
 	if (!is_object($at_arr[$j])) {
-        	//just skip it
-        } elseif ($at_arr[$j]->isError()) {
+		//just skip it
+	} elseif ($at_arr[$j]->isError()) {
 		echo  json_encode( array( 'message' => $at_arr[$j]->getErrorMessage() ) );
-        	exit();
-        } else {
+		exit();
+	} else {
 		// get only fields having 'select' type
 		$fields = $at_arr[$j]->getExtraFields( 1 );
 

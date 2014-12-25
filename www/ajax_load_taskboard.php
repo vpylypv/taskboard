@@ -44,19 +44,16 @@ if( $user_stories_tracker ) {
 
 foreach( $columns as $column ) {
 	$phases[] = array(
-//		'id' => $column->getDomID(),
 		'id' => $column->getID(),
 		'dom_id' => $column->getDomID(),
 		'title' => $column->getTitle(),
 		'titlebackground' => $column->getTitleBackgroundColor(),
-	   	'background' => $column->getColumnBackgroundColor(),
+		'background' => $column->getColumnBackgroundColor(),
 		'resolutions' =>  array_values( $column->getResolutions() )
 	);
 }
 
 $ret['user_stories'] = $user_stories;
 $ret['phases'] = $phases;
-
-
 
 echo json_encode( $ret );

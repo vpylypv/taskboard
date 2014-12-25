@@ -28,9 +28,9 @@ $column_max_tasks = getStringFromRequest('column_max_tasks','');
 
 
 if (getStringFromRequest('post_changes')) {
-        if( $taskboard->addColumn($column_title, $title_bg_color, $color_bg_color, $column_max_tasks) ) {
-                $feedback.=_('Successfully Added');
-        }
+	if( $taskboard->addColumn($column_title, $title_bg_color, $color_bg_color, $column_max_tasks) ) {
+		$feedback.=_('Successfully Added');
+	}
 }
 
 
@@ -58,18 +58,17 @@ $columns = $taskboard->getColumns();
 ?>
 
 <?php
+$tablearr = array(_('Order'),_('Title'),_('Max number of tasks'),_('Assigned resolutions'),_('Drop resolution'));
 
-        $tablearr = array(_('Order'),_('Title'),_('Max number of tasks'),_('Assigned resolutions'),_('Drop resolution'));
+ echo $HTML->listTableTop($tablearr, false, 'sortable_table_tracker', 'sortable_table_tracker');
+foreach( $columns as $column ) {
+	$downLink = '';
+	if( $column->getOrder() < count( $columns ) ) {
+		$downLink = util_make_link ('/plugins/taskboard/admin/?group_id='.$group_id.'&amp;action=down_column&amp;column_id='.$column->getID(), "<img alt='" ._('Down'). "' src='/images/pointer_down.png'>" );
+	}
 
-        echo $HTML->listTableTop($tablearr, false, 'sortable_table_tracker', 'sortable_table_tracker');
-        foreach( $columns as $column ) {
-		$downLink = '';
-		if( $column->getOrder() < count( $columns ) ) {
-			$downLink = util_make_link ('/plugins/taskboard/admin/?group_id='.$group_id.'&amp;action=down_column&amp;column_id='.$column->getID(), "<img alt='" ._('Down'). "' src='/images/pointer_down.png'>" );
-		}
-
-		echo '
-                <tr valign="middle">
+	echo '
+		<tr valign="middle">
 			<td>'.
 				$column->getOrder().
 				"&nbsp;".
@@ -78,7 +77,7 @@ $columns = $taskboard->getColumns();
 			<td>
 			<div style="float: left; border: 1px solid grey; height: 30px; width: 20px; background-color: '.$column->getColumnBackgroundColor().'; margin-right: 10px;"><div style="width: 100%; height: 10px; background-color: '.$column->getTitleBackgroundColor().';"></div></div>'.
 				util_make_link ('/plugins/taskboard/admin/?group_id='.$group_id.'&amp;action=edit_column&amp;column_id='.$column->getID(),
-                        	$column->getTitle() ).'</a></td>
+				$column->getTitle() ).'</a></td>
 			<td>'.$column->getMaxTasks().'</td>
 			<td>'.implode(', ', array_values( $column->getResolutions() )).'</td>
 			<td>'.$column->getResolutionByDefault().'</td>
@@ -94,24 +93,24 @@ $columns = $taskboard->getColumns();
 
 <h2>Add new column:</h2>
 <table>
-                        <tr><td><strong><?php echo _('Title') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><input type="text" name="column_title"></td></tr>
-                        <tr><td><strong><?php echo _('Title backgound color') ?></strong></td><td><?= $taskboard->colorBgChooser('title_bg_color') ?></td></tr>
-                        <tr><td><strong><?php echo _('Column Background color') ?></strong></td><td><?= $taskboard->colorBgChooser('column_bg_color', 'none') ?></td></tr>
-			<tr><td><strong><?php echo _('Maximum tasks number') ?></strong></td><td><input type="text" name="column_max_tasks"></td></tr>
-			<tr><td><strong><?php echo _('Drop resolution by default') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><select id="resolution_by_default" name="resolution_by_default">
+	<tr><td><strong><?php echo _('Title') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><input type="text" name="column_title"></td></tr>
+	<tr><td><strong><?php echo _('Title backgound color') ?></strong></td><td><?= $taskboard->colorBgChooser('title_bg_color') ?></td></tr>
+	<tr><td><strong><?php echo _('Column Background color') ?></strong></td><td><?= $taskboard->colorBgChooser('column_bg_color', 'none') ?></td></tr>
+	<tr><td><strong><?php echo _('Maximum tasks number') ?></strong></td><td><input type="text" name="column_max_tasks"></td></tr>
+	<tr><td><strong><?php echo _('Drop resolution by default') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><select id="resolution_by_default" name="resolution_by_default">
 <?php
 foreach( $taskboard->getUnusedResolutions() as $resolution ) {
 	echo '<option value="'.htmlspecialchars( $resolution).'">' . htmlspecialchars( $resolution) . "</option>";
 }
 ?>
 </select></td></tr>
-                </table>
+</table>
 
 <p>
 <input type="submit" name="post_changes" value="<?php echo _('Submit') ?>" />
 </p>
 
 <?php
-        echo utils_requiredField().' '._('Indicates required fields.');
+echo utils_requiredField().' '._('Indicates required fields.');
 ?>
 

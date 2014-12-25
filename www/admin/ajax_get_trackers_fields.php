@@ -41,11 +41,11 @@ $at_arr = $atf->getArtifactTypes();
 $init = true;
 for ($j = 0; $j < count($at_arr); $j++) {
 	if (!is_object($at_arr[$j])) {
-        	//just skip it
-        } elseif ($at_arr[$j]->isError()) {
+		//just skip it
+	} elseif ($at_arr[$j]->isError()) {
 		echo  json_encode( array( 'message' => $at_arr[$j]->getErrorMessage() ) );
-        	exit();
-        } else {
+		exit();
+	} else {
 		$tracker_id = $at_arr[$j]->getID();
 
 		if( in_array( $tracker_id, $used_trackers ) ) {
@@ -53,13 +53,13 @@ for ($j = 0; $j < count($at_arr); $j++) {
 			$fields = $at_arr[$j]->getExtraFields();
 			$tmp = array();
 			foreach( $allowed_types as $allowed_type) {
-        			$tmp[$allowed_type] = array();
+				$tmp[$allowed_type] = array();
 			}
 			foreach( $fields as $field) {
 				if( $init ) {
 					if( in_array( $field['field_type'], $allowed_types) ) {
 						$tmp[ $field['field_type'] ][ $field['alias'] ] = $field['field_name'];
-                                        }
+					}
 				} elseif( 
 					in_array( $field['alias'], array_keys( $common_fields[ $field['field_type'] ]) ) && 
 					in_array( $field['field_type'], $allowed_types) ) {

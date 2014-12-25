@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-require_once dirname(__FILE__)."/../../env.inc.php";
+require_once $gfwww."env.inc.php";
 require_once $gfcommon.'include/pre.php';
 require_once $gfconfig.'plugins/taskboard/config.php' ;
 
@@ -37,7 +37,7 @@ if (!$user || !is_object($user) ) {
 	exit();
 } else if ( !$user->isActive()) {
 	echo  json_encode( array( 'message' => _('Invalid User : Not active') ) );
-        exit();
+	exit();
 }
 
 $group_id = getIntFromPost( 'group_id');
@@ -47,12 +47,12 @@ error_log( 'AJAX :'.print_r( $_POST,1) );
 
 if (!$group_id) {
 	echo  json_encode( array( 'message' => _('Cannot Process your request : No ID specified') ) );
-        exit();
+	exit();
 } else {
 	$group = group_get_object($group_id);
 	if ( !$group) {
 		echo  json_encode( array( 'message' => _('Group is not found') ) );
-        	exit();
+		exit();
 	}
 
 	$taskboard = new TaskBoardHtml( $group ) ;
@@ -64,5 +64,3 @@ if (!$group_id) {
 		echo  json_encode( array( 'message' => 'OK' ) );
 	}
 }
-
-?>

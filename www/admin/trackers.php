@@ -58,7 +58,7 @@ for ($j = 0; $j < count($at_arr); $j++) {
 		if( $at_arr[$j]->getID() )
 	
 		$fields = $at_arr[$j]->getExtraFields();
-                foreach( $fields as $field) {
+		foreach( $fields as $field) {
 			if( $field['alias'] == 'resolution' ) {
 				$trackers[] = $at_arr[$j];
 			}
@@ -130,41 +130,41 @@ if(  count($at_arr) > 0 ) {
 	foreach( $trackers as $tracker ) {
 		$tracker_id = $tracker->getID();
 		echo '
-                <tr valign="middle">
-                        <td><a href="'.util_make_url ('/tracker/?atid='.$tracker_id.'&amp;group_id='.$group_id.'&amp;func=browse').'">'.
-                                html_image("ic/tracker20w.png","20","20").' &nbsp;'.
-                                $tracker->getName() .'</a>
-                        </td>
-                        <td>' .  $tracker->getDescription() .'
-                        </td>
-                        <td><input type="checkbox" name="use[]" value="'.$tracker_id.'" class="use_tracker" '.
-			(in_array($tracker_id, $trackers_selected) ? 'checked' : '' ).'></td>
-                        <td>'. $taskboard->colorBgChooser( 
-				'bg['.$tracker_id.']',
-				( array_key_exists($tracker_id, $trackers_bgcolor) ? $trackers_bgcolor[$tracker_id]  : NULL  ) 
-			) .'</td>
-                </tr>';
+			<tr valign="middle">
+				<td><a href="'.util_make_url ('/tracker/?atid='.$tracker_id.'&amp;group_id='.$group_id.'&amp;func=browse').'">'.
+					html_image("ic/tracker20w.png","20","20").' &nbsp;'.
+					$tracker->getName() .'</a>
+				</td>
+				<td>' .  $tracker->getDescription() .'
+				</td>
+				<td><input type="checkbox" name="use[]" value="'.$tracker_id.'" class="use_tracker" '.
+					(in_array($tracker_id, $trackers_selected) ? 'checked' : '' ).'></td>
+				<td>'. $taskboard->colorBgChooser( 
+					'bg['.$tracker_id.']',
+					( array_key_exists($tracker_id, $trackers_bgcolor) ? $trackers_bgcolor[$tracker_id]  : NULL  ) 
+				) .'</td>
+			</tr>';
 	}
 	echo $HTML->listTableBottom();
 
 ?>
-                <table>
-			<tr><td><strong><?php echo _('Use first column by default') ?></strong></td><td><input name="first_column_by_default" type="checkbox" <?= ($first_column_by_default? 'checked' : '')  ?> value="1"></td></tr>
-                        <tr><td><strong><?php echo _('Filter field') ?></strong></td><td><select name="filter_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
-                        <tr><td><strong><?php echo _('Estimated cost field') ?></strong></td><td><select name="estimated_cost_field"><option option value=""><?= _('Not defined') ?></option></select></td></tr>
-                        <tr><td><strong><?php echo _('Remaining cost field') ?></strong></td><td><select name="remaining_cost_field"><option option value=""><?= _('Not defined') ?></option></select></td></tr>
-                </table>
+<table>
+	<tr><td><strong><?php echo _('Use first column by default') ?></strong></td><td><input name="first_column_by_default" type="checkbox" <?= ($first_column_by_default? 'checked' : '')  ?> value="1"></td></tr>
+	<tr><td><strong><?php echo _('Filter field') ?></strong></td><td><select name="filter_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('Estimated cost field') ?></strong></td><td><select name="estimated_cost_field"><option option value=""><?= _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('Remaining cost field') ?></strong></td><td><select name="remaining_cost_field"><option option value=""><?= _('Not defined') ?></option></select></td></tr>
+</table>
 
 
-		<table>
-                        <tr><td><strong><?php echo _('User stories tracker') ?></strong></td><td><select name="user_stories_tracker"><option value=""><?= _('Not defined') ?></option></select></td></tr>
-			<tr><td><strong><?php echo _('User stories reference field') ?></strong>&nbsp;<span id='usrefreq' style='display: none;'><?= utils_requiredField(); ?></span></td><td><select name="user_stories_reference_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
-			<tr><td><strong><?php echo _('User stories sorting field') ?></strong></td><td><select name="user_stories_sort_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
-		</table>
+<table>
+	<tr><td><strong><?php echo _('User stories tracker') ?></strong></td><td><select name="user_stories_tracker"><option value=""><?= _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('User stories reference field') ?></strong>&nbsp;<span id='usrefreq' style='display: none;'><?= utils_requiredField(); ?></span></td><td><select name="user_stories_reference_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('User stories sorting field') ?></strong></td><td><select name="user_stories_sort_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
+</table>
 
-                <p>
-                <input type="submit" name="post_changes" value="<?php echo _('Submit') ?>" />
-                </p>
+<p>
+	<input type="submit" name="post_changes" value="<?php echo _('Submit') ?>" />
+</p>
 
 <?php
 	echo utils_requiredField().' '._('Indicates required fields.');
@@ -190,152 +190,144 @@ jQuery(function($){
 		}
 
 		var str = '<option value=""><?= _('Not defined') ?></option>';
-                $.each(all_trackers, function(key, value)
-                {
+		$.each(all_trackers, function(key, value) {
 			if( !$('input.use_tracker[value=' + value.id + ']').is(':checked') ) {
-                		str +='<option value="'+ value.id +'"'+ ( value.id == selected ? 'selected' : '' ) +'>'+ value.name +'</option>';
+				str +='<option value="'+ value.id +'"'+ ( value.id == selected ? 'selected' : '' ) +'>'+ value.name +'</option>';
 			}
-                });
-                $('select[name=user_stories_tracker]').empty().html(str);
+		});
+		$('select[name=user_stories_tracker]').empty().html(str);
 
 		loadUserStorySortFields();
 	}
 
 	function loadUserStorySortFields() {
 		$.ajax({
-                                type: 'POST',
-                                url: '/plugins/taskboard/admin/ajax.php',
-                                dataType: 'json',
-                                data : {
-                                        action : 'get_trackers_fields',
-                                        group_id     : <?= $group_id ?>,
-                                        'trackers[]' : [ $('select[name=user_stories_tracker]').val() ]
-                                },
-                                async: false
-                }).done(function( answer ) {
-                                if(answer['message']) {
-                                        showMessage(answer['message'], 'error');
-                                }
+			type: 'POST',
+			url: '/plugins/taskboard/admin/ajax.php',
+			dataType: 'json',
+			data : {
+				action : 'get_trackers_fields',
+				group_id     : <?= $group_id ?>,
+				'trackers[]' : [ $('select[name=user_stories_tracker]').val() ]
+			},
+			async: false
+		}).done(function( answer ) {
+			if(answer['message']) {
+				showMessage(answer['message'], 'error');
+			}
 
-                                if( answer['common_selects'] || answer['common_texts'] ) {
-                                        var selected = $('select[name=user_stories_sort_field] option:selected').val();
-                                        if( !selected ) {
-                                                selected = '<?= $user_stories_sort_field ?>';
-                                        }
+			if( answer['common_selects'] || answer['common_texts'] ) {
+				var selected = $('select[name=user_stories_sort_field] option:selected').val();
+				if( !selected ) {
+					selected = '<?= $user_stories_sort_field ?>';
+				}
 
-                                        var str = '<option value=""><?= _('Not defined') ?></option>';
-					if( answer['common_selects'] ) {
-	                                        $.each(answer['common_selects'], function(key, value)
-        	                                {
-                	                                str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
-                        	                });
-					}
+				var str = '<option value=""><?= _('Not defined') ?></option>';
+				if( answer['common_selects'] ) {
+					$.each(answer['common_selects'], function(key, value) {
+						str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
+					});
+				}
 
-					if( answer['common_texts'] ) {
-                                                $.each(answer['common_texts'], function(key, value)
-                                                {
-                                                        str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
-                                                });
-                                        }
-
-                                        $('select[name=user_stories_sort_field]').empty().html(str);
-                                }
-
-                });
-
+				if( answer['common_texts'] ) {
+					$.each(answer['common_texts'], function(key, value) {
+						str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
+					});
+				}
+	
+				$('select[name=user_stories_sort_field]').empty().html(str);
+			}
+		});
 	}
 
 	function loadTrackersFields() {
 		var trackers = new Array();
-                $('input.use_tracker').each( function () {
-                        if ( $(this).is(':checked') ) {
+		$('input.use_tracker').each( function () {
+			if ( $(this).is(':checked') ) {
 				trackers.push( $(this).attr('value') );
-                        }
-                });
+			}
+		});
 
 		if( trackers.length == 0 ) {
 			showMessage("<?= _('Choose at least one tracker for using with taskboard.') ?>", "warning");
 		} 
 
-			$.ajax({
-                		type: 'POST',
-                		url: '/plugins/taskboard/admin/ajax.php',
-                		dataType: 'json',
-                		data : {
-					action : 'get_trackers_fields',
-					group_id     : <?= $group_id ?>,
-					'trackers[]' : trackers
-				},
-                		async: false
-                	}).done(function( answer ) {
-				if(answer['message']) {
-					showMessage(answer['message'], 'error');
+		$.ajax({
+			type: 'POST',
+			url: '/plugins/taskboard/admin/ajax.php',
+			dataType: 'json',
+			data : {
+				action : 'get_trackers_fields',
+				group_id : <?= $group_id ?>,
+				'trackers[]' : trackers
+			},
+			async: false
+		}).done(function( answer ) {
+			if(answer['message']) {
+				showMessage(answer['message'], 'error');
+			}
+
+			if( answer['common_selects'] ) {
+				var selected = $('select[name=filter_field] option:selected').val();
+				if( !selected ) {
+					selected = '<?= $filter_field ?>';
 				}
 
-				if( answer['common_selects'] ) {
-					var selected = $('select[name=filter_field] option:selected').val();
-					if( !selected ) {
-						selected = '<?= $filter_field ?>';
-					}
+				var str = '<option value=""><?= _('Not defined') ?></option>';
+				$.each(answer['common_selects'], function(key, value)
+				{
+					str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
+				});
+				$('select[name=filter_field]').empty().html(str);
+			}
 
-					var str = '<option value=""><?= _('Not defined') ?></option>';
-					$.each(answer['common_selects'], function(key, value)
-					{
-  						str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
-					});
-					$('select[name=filter_field]').empty().html(str);
+			if( answer['common_texts'] ) {
+				var selected = $('select[name=estimated_cost_field] option:selected').val();
+				if( !selected ) {
+					selected = '<?= $estimated_cost_field ?>';
 				}
 
-				if( answer['common_texts'] ) {
-                                        var selected = $('select[name=estimated_cost_field] option:selected').val();
-					if( !selected ) {
-                                                selected = '<?= $estimated_cost_field ?>';
-                                        }
+				var str = '<option value=""><?= _('Not defined') ?></option>';
+				$.each(answer['common_texts'], function(key, value) {
+					str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
+				});
+				$('select[name=estimated_cost_field]').empty().html(str);
+			}
 
-                                        var str = '<option value=""><?= _('Not defined') ?></option>';
-                                        $.each(answer['common_texts'], function(key, value)
-                                        {
-                                                str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
-                                        });
-                                        $('select[name=estimated_cost_field]').empty().html(str);
-                                }
+			if( answer['common_texts'] ) {
+				var selected = $('select[name=remaining_cost_field] option:selected').val();
+				if( !selected ) {
+					selected = '<?= $remaining_cost_field ?>';
+				}
 
-				if( answer['common_texts'] ) {
-                                        var selected = $('select[name=remaining_cost_field] option:selected').val();
-					if( !selected ) {
-                                                selected = '<?= $remaining_cost_field ?>';
-                                        }
+				var str = '<option value=""><?= _('Not defined') ?></option>';
+				$.each(answer['common_texts'], function(key, value) {
+					str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
+				});
+				$('select[name=remaining_cost_field]').empty().html(str);
+			}
 
-                                        var str = '<option value=""><?= _('Not defined') ?></option>';
-                                        $.each(answer['common_texts'], function(key, value)
-                                        {
-                                                str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
-                                        });
-                                        $('select[name=remaining_cost_field]').empty().html(str);
-                                }
+			if( answer['common_refs'] ) {
+				var selected = $('select[name=user_stories_reference_field] option:selected').val();
+				if( !selected ) {
+					selected = '<?= $user_stories_reference_field ?>';
+				}
 
-				if( answer['common_refs'] ) {
-                                        var selected = $('select[name=user_stories_reference_field] option:selected').val();
-					if( !selected ) {
-                                                selected = '<?= $user_stories_reference_field ?>';
-                                        }
+				user_story_ref_field = '<option value=""><?= _('Not defined') ?></option>';
+				$.each(answer['common_refs'], function(key, value) {
+					user_story_ref_field +='<option value="'+ key +'"'+ ( ( (key == selected) || (!selected && key=='user_story') ) ? 'selected' : '' ) +'>'+ value +'</option>';
+				});
 
-                                        user_story_ref_field = '<option value=""><?= _('Not defined') ?></option>';
-                                        $.each(answer['common_refs'], function(key, value)
-                                        {
-                                                user_story_ref_field +='<option value="'+ key +'"'+ ( ( (key == selected) || (!selected && key=='user_story') ) ? 'selected' : '' ) +'>'+ value +'</option>';
-                                        });
+				if( $('select[name=user_stories_tracker]').val() ) {
+					$('select[name=user_stories_reference_field]').empty().html(user_story_ref_field);
+				} else {
+					$('select[name=user_stories_reference_field]').empty().html('<option value=""><?= _('Not defined') ?></option>');
+				}
+			}
 
-					if( $('select[name=user_stories_tracker]').val() ) {
-                                        	$('select[name=user_stories_reference_field]').empty().html(user_story_ref_field);
-					} else {
-						$('select[name=user_stories_reference_field]').empty().html('<option value=""><?= _('Not defined') ?></option>');
-					}
-                                }
-
-				loadUserStoriesTrackers();
-                	});
-        }
+			loadUserStoriesTrackers();
+		});
+	}
 
 	$('input.use_tracker').click( function () {
 		cleanMessages();
@@ -354,7 +346,7 @@ jQuery(function($){
 		}
 	});
 
-        loadUserStoriesTrackers();
+	loadUserStoriesTrackers();
 	loadTrackersFields();
 });
 </script>

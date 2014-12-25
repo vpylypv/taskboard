@@ -50,12 +50,12 @@ class TaskBoardHtml extends TaskBoard {
 				$action = getStringFromRequest('action');
 				if($action=='edit_column') {
 					$labels[] = _('Configure Columns');
-                                	$links[]  = '/plugins/taskboard/admin/index.php?group_id='.$group_id.'&action=columns';
+					$links[]  = '/plugins/taskboard/admin/index.php?group_id='.$group_id.'&action=columns';
 
 					$column_id = getStringFromRequest('column_id','');
 					if( $column_id ) {
 						$labels[] = _('Delete Column');
-        	                                $links[]  = '/plugins/taskboard/admin/index.php?group_id='.$group_id.'&action=delete_column&column_id='.$column_id;
+						$links[]  = '/plugins/taskboard/admin/index.php?group_id='.$group_id.'&action=delete_column&column_id='.$column_id;
 					}
 				}
 			}
@@ -74,13 +74,13 @@ class TaskBoardHtml extends TaskBoard {
 		if( !$selected_color ) {
 			$selected_color = $default_color;
 		}
-                foreach( $colors as $color ) {
-                        $selected = '';
-                        if( $color == $selected_color ) {
-                                $selected = ' checked';
-                        }
-                        $ret .= '<td style="background-color: '.$color.'; padding: 0;"><input type="radio" name="'.$name.'" value="'.$color.'" style="margin: 6px;"'.$selected.'></td>';
-                }
+		foreach( $colors as $color ) {
+			$selected = '';
+			if( $color == $selected_color ) {
+				$selected = ' checked';
+			}
+			$ret .= '<td style="background-color: '.$color.'; padding: 0;"><input type="radio" name="'.$name.'" value="'.$color.'" style="margin: 6px;"'.$selected.'></td>';
+		}
 		$ret .= '</tr></table>';
 
 		return $ret;
@@ -88,10 +88,3 @@ class TaskBoardHtml extends TaskBoard {
 
 	
 }
-
-// Local Variables:
-// mode: php
-// c-file-style: "bsd"
-// End:
-
-?>

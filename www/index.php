@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-require_once dirname(__FILE__)."/../../env.inc.php";
+require_once $gfwww."env.inc.php";
 require_once $gfcommon.'include/pre.php';
 
 if( file_exists( $gfconfig.'plugins/taskboard/config.php' ) ) {
@@ -69,12 +69,12 @@ if (!$group_id) {
 		)
 	);
 
-        if( $taskboard->isError() ) {
+	if( $taskboard->isError() ) {
 		exit_error($taskboard->getErrorMessage());
 	} else {
 
 		if( count( $taskboard->getUsedTrackersIds() ) == 0 ) {
-		        exit_error( _('Choose at least one tracker for using with taskboard.') );
+			exit_error( _('Choose at least one tracker for using with taskboard.') );
 		}
 
 		$columns = $taskboard->getColumns();
@@ -101,14 +101,14 @@ $tech_id_arr = array () ;
 $tech_name_arr = array () ;
 
 foreach ($techs as $tech) {
-        $tech_id_arr[] = $tech->getID() ;
-        $tech_name_arr[] = $tech->getRealName() ;
+	$tech_id_arr[] = $tech->getID() ;
+	$tech_name_arr[] = $tech->getRealName() ;
 }
 $tech_id_arr[]='0';  //this will be the 'any' row
 $tech_name_arr[]=_('Any');
 
 if (is_array($_assigned_to)) {
-        $_assigned_to='';
+	$_assigned_to='';
 }
 $tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assigned_to',$_assigned_to,true,_('Unassigned'));
 // end of the stolen code
@@ -117,15 +117,15 @@ $tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assig
 
 
 <div class="tabbertab'.($af->query_type == 'custom' ? ' tabbertabdefault' : '').'" title="'._('Simple Filtering and Sorting').'">
-        <form action="'. getStringFromServer('PHP_SELF') .'?group_id='.$group_id.'&amp;atid='.$ath->getID().'" method="post">
-        <table width="100%" cellspacing="0">
-        <tr>
-        <td>
-        <?php echo _('Assignee').':&nbsp;'. $tech_box ; ?>
-        </td>
-        </tr>
-        </table>
-        </form>
+	<form action="'. getStringFromServer('PHP_SELF') .'?group_id='.$group_id.'&amp;atid='.$ath->getID().'" method="post">
+		<table width="100%" cellspacing="0">
+			<tr>
+				<td>
+					<?php echo _('Assignee').':&nbsp;'. $tech_box ; ?>
+				</td>
+			</tr>
+		</table>
+	</form>
 </div>
 
 <table id="agile-board">
@@ -177,13 +177,13 @@ $tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assig
 
 	<div>
 		 <strong><?php echo _('Summary')?><?php echo utils_requiredField(); ?>:</strong><br />
-                <input id="tracker-summary" title="<?php echo util_html_secure(_('The summary text-box represents a short tracker item summary. Useful when browsing through several tracker items.')) ?>" type="text" name="summary" size="70" value="" maxlength="255" />	
+		<input id="tracker-summary" title="<?php echo util_html_secure(_('The summary text-box represents a short tracker item summary. Useful when browsing through several tracker items.')) ?>" type="text" name="summary" size="70" value="" maxlength="255" />	
 	</div>
 
 	<div>
 		<strong><?php echo _('Detailed description') ?><?php echo utils_requiredField(); ?>: </strong>
-                <br />
-                <textarea id="tracker-description" name="description" rows="10" cols="79" title="<?php echo util_html_secure(html_get_tooltip_description('description')) ?>"></textarea>
+		<br />
+		<textarea id="tracker-description" name="description" rows="10" cols="79" title="<?php echo util_html_secure(html_get_tooltip_description('description')) ?>"></textarea>
 	</div>
 </div>
 
@@ -212,33 +212,33 @@ jQuery( document ).ready(function( $ ) {
 				id: "new-task-dialog-submit-button",
 				click : function () {
 					jQuery.ajax({
-                                                                type: 'POST',
-                                                                url: '<?php echo util_make_url('/plugins/taskboard/ajax.php') ;?>',
-                                                                dataType: 'json',
-                                                                data : {
-                                                                        action   : 'add',
-									group_id : gGroupId,
-                                                                        tracker_id : jQuery('#tracker_id').val(),
-									user_story_id : jQuery('#user_story_id').val(), 
-                                                                        title : jQuery('#tracker-summary').val(),
-									desc : jQuery('#tracker-description').val() 
-                                                                },
-                                                                async: true
-                                                        }).done(function( answer ) {
-								jQuery('#new-task-dialog').dialog( "close" );
+						type: 'POST',
+						url: '<?php echo util_make_url('/plugins/taskboard/ajax.php') ;?>',
+						dataType: 'json',
+						data : {
+							action : 'add',
+							group_id : gGroupId,
+							tracker_id : jQuery('#tracker_id').val(),
+							user_story_id : jQuery('#user_story_id').val(), 
+							title : jQuery('#tracker-summary').val(),
+							desc : jQuery('#tracker-description').val() 
+						},
+						async: true
+					}).done(function( answer ) {
+						jQuery('#new-task-dialog').dialog( "close" );
 
-                                                                if(answer['message']) {
-                                                                        showMessage(answer['message'], 'error');
-                                                                }
+						if(answer['message']) {
+							showMessage(answer['message'], 'error');
+						}
 
-                                                                if(answer['action'] == 'reload') {
-                                                                        // reload whole board
-                                                                        loadTaskboard( gGroupId );
-                                                                }
-                                                        }).fail(function( jqxhr, textStatus, error ) {
-                                                                var err = textStatus + ', ' + error;
-                                                                alert(err);
-                                                        });
+						if(answer['action'] == 'reload') {
+							// reload whole board
+							loadTaskboard( gGroupId );
+						}
+					}).fail(function( jqxhr, textStatus, error ) {
+						var err = textStatus + ', ' + error;
+						alert(err);
+					});
 				}
 			},
 			{

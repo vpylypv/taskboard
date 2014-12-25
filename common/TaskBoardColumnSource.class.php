@@ -34,18 +34,18 @@ require_once $gfplugins.'taskboard/common/TaskBoardColumn.class.php';
 function &taskboard_column_source_get_object($taskboard_source_column_id,$taskboard_target_column_id, $data=NULL) {
 	if( !$data ) {
 		$res = db_query_params ('SELECT * FROM plugin_taskboard_columns_sources i
-        	WHERE source_taskboard_column_id=$1 AND target_taskboard_column_id=$2', 
+			WHERE source_taskboard_column_id=$1 AND target_taskboard_column_id=$2', 
 		array($taskboard_source_column_id,$taskboard_target_column_id) ) ;
-        	if (db_numrows($res) <1 ) {
+		if (db_numrows($res) <1 ) {
 			$data = array(
 				'taskboard_column_source_id' => NULL,
-			        'target_taskboard_column_id' => $taskboard_target_column_id,
-			        'source_taskboard_column_id' => $taskboard_source_column_id,
-			        'target_resolution' => '',
-		        	'alert' => NULL,
-			        'autoassign' => 0
+				'target_taskboard_column_id' => $taskboard_target_column_id,
+				'source_taskboard_column_id' => $taskboard_source_column_id,
+				'target_resolution' => '',
+				'alert' => NULL,
+				'autoassign' => 0
 			);
-	        } else {
+		} else {
 			$data = db_fetch_array($res);
 		}
 	}
@@ -66,129 +66,126 @@ function &taskboard_column_source_get_object($taskboard_source_column_id,$taskbo
  */
 function &taskboard_default_column_source_get_object($taskboard_target_column_id, $data=NULL) {
 	if( !$data ) {
-	        $res = db_query_params ('SELECT * FROM plugin_taskboard_columns_sources 
-        	WHERE source_taskboard_column_id IS NULL AND target_taskboard_column_id=$1',
-	        array($taskboard_target_column_id) ) ;
-        	if (db_numrows($res) <1 ) {
-                	$data = array(
-                        	'taskboard_column_source_id' => NULL,
-	                        'target_taskboard_column_id' => $taskboard_target_column_id,
-        	                'source_taskboard_column_id' => NULL,
-                	        'target_resolution' => '',
-                        	'alert' => NULL,
-	                        'autoassign' => 0
-	                );
-        	} else {
-	        	$data = db_fetch_array($res);
+		$res = db_query_params ('SELECT * FROM plugin_taskboard_columns_sources 
+			WHERE source_taskboard_column_id IS NULL AND target_taskboard_column_id=$1',
+			array($taskboard_target_column_id) ) ;
+		if (db_numrows($res) <1 ) {
+			$data = array(
+				'taskboard_column_source_id' => NULL,
+				'target_taskboard_column_id' => $taskboard_target_column_id,
+				'source_taskboard_column_id' => NULL,
+				'target_resolution' => '',
+				'alert' => NULL,
+				'autoassign' => 0
+			);
+		} else {
+			$data = db_fetch_array($res);
 		}
 	}
 
-        $ColumnSource = new TaskBoardColumnSource($data);
-        return $ColumnSource;
+	$ColumnSource = new TaskBoardColumnSource($data);
+	return $ColumnSource;
 }
 
 class TaskBoardColumnSource extends Error {
-        /**
-         * The Taskboard object.
-         *
-         * @var         object  $Taskboard.
-         */
-        var $Taskboard; //taskboard object
+	/**
+	 * The Taskboard object.
+	 *
+	 * @var         object  $Taskboard.
+	*/
+	var $Taskboard; //taskboard object
 
 
-        /**
-         * Array of artifact data.
-         *
-         * @var         array   $data_array.
-         */
-        var $data_array;
+	/**
+	 * Array of artifact data.
+	 *
+	 * @var         array   $data_array.
+	 */
+	var $data_array;
 	
 
 	function TaskBoardColumnSource($arr=false) {
-
-		// try to get Taskboard object
-		//$this->Taskboard = $Taskboard;
-                if (is_array($arr)) {
-        		$this->data_array =& $arr;
+		if (is_array($arr)) {
+			$this->data_array =& $arr;
 		}
 
 		// check source and target columns 
 	}
 
 	/**
-         *      fetchData - re-fetch the data for this TaskBoardColumn from the database.
-         *
-         *      @param  int             The taskboard column ID.
-         *      @return boolean success.
-         */
-        function fetchData($id) {
-                $res = db_query_params ('SELECT * FROM plugin_taskboard_columns_sources WHERE taskboard_column_source_id=$1', array ($id)) ;
-                if (!$res || db_numrows($res) < 1) {
-                        $this->setError('TaskBoard: Invalid TaskBoardColumnSourceID');
-                        return false;
-                }
-                $this->data_array = db_fetch_array($res);
-                db_free_result($res);
-                return true;
-        }
+	 *      fetchData - re-fetch the data for this TaskBoardColumn from the database.
+	 *
+	 *      @param  int             The taskboard column ID.
+	 *      @return boolean success.
+	 */
+	function fetchData($id) {
+		$res = db_query_params ('SELECT * FROM plugin_taskboard_columns_sources WHERE taskboard_column_source_id=$1', array ($id)) ;
+		if (!$res || db_numrows($res) < 1) {
+			$this->setError('TaskBoard: Invalid TaskBoardColumnSourceID');
+			return false;
+		}
+		$this->data_array = db_fetch_array($res);
+		db_free_result($res);
+		return true;
+	}
 
 	/**
-         *      getID - get this TaskBoardColumnSourceID.
-         *
-         *      @return int     The taskboard_column_source_id
-         */
-        function getID() {
-                return $this->data_array['taskboard_column_source_id'];
-        }
+	 *      getID - get this TaskBoardColumnSourceID.
+	 *
+	 *      @return int     The taskboard_column_source_id
+	 */
+	function getID() {
+		return $this->data_array['taskboard_column_source_id'];
+	}
 
 	/**
-         *      getSourceColumnID - get source column ID
-         *
-         *      @return int     The taskboard_column_source_id
-         */
-        function getSourceColumnID() {
-                return $this->data_array['source_taskboard_column_id'];
-        }
+	 *      getSourceColumnID - get source column ID
+	 *
+	 *      @return int     The taskboard_column_source_id
+	 */
+	function getSourceColumnID() {
+		return $this->data_array['source_taskboard_column_id'];
+	}
 
 	/**
-         *      getTargetColumnID - get target column ID
-         *
-         *      @return int     The taskboard_column_target_id
-         */
-        function getTargetColumnID() {
-                return $this->data_array['target_taskboard_column_id'];
-        }
+	 *      getTargetColumnID - get target column ID
+	 *
+	 *      @return int     The taskboard_column_target_id
+	 */
+	function getTargetColumnID() {
+		return $this->data_array['target_taskboard_column_id'];
+	}
 
 
 	/**
-         *      getTargetResolution - get resolution, that should be assigned when card is droped from source column to the target one
-         *
-         *      @return string
-         */
-        function getTargetResolution() {
-                return $this->data_array['target_resolution'];
-        }
+	 *      getTargetResolution - get resolution, that should be assigned when card is droped from source column to the target one
+	 *
+	 *      @return string
+	 */
+	function getTargetResolution() {
+		return $this->data_array['target_resolution'];
+	}
 
 	/**
-         *      getAlertText - get text, that should be shown when card is droped from source column to the target one
-         *
-         *      @return string
-         */
-        function getAlertText() {
-                return $this->data_array['alert'];
-        }
+	 *      getAlertText - get text, that should be shown when card is droped from source column to the target one
+	 *
+	 *      @return string
+	 */
+	function getAlertText() {
+		return $this->data_array['alert'];
+	}
 
 	/**
-         *      getAutoassign - get autoassign flag. Current user is assigend to the task if autoassign is 1
-         *
-         *      @return int
-         */
-        function getAutoassign() {
-                return $this->data_array['autoassign'];
-        }
+	 *      getAutoassign - get autoassign flag. Current user is assigend to the task if autoassign is 1
+	 *
+	 *      @return int
+	 */
+	function getAutoassign() {
+		return $this->data_array['autoassign'];
+	}
 
 
-        function save($target_resolution, $alert='', $autoassign=0) {
+	function save($target_resolution, $alert='', $autoassign=0) {
 
 		if( $this->getSourceColumnID()  ) {
 			$source_column_id = intval(  $this->getSourceColumnID() );
@@ -199,42 +196,39 @@ class TaskBoardColumnSource extends Error {
 		}
 
 		$res = db_query_params (
-                                'SELECT * FROM plugin_taskboard_columns_sources WHERE target_taskboard_column_id=$1'.$wsql,
-                                array ($this->getTargetColumnID())
+			'SELECT * FROM plugin_taskboard_columns_sources WHERE target_taskboard_column_id=$1'.$wsql,
+			array ($this->getTargetColumnID())
 		) ;
-                if (!$res) {
-                	$this->setError('TaskBoardColumnSource: cannot save drop rule');
-                        return false;
-                }
-                $row = db_fetch_array($res);
+		if (!$res) {
+			$this->setError('TaskBoardColumnSource: cannot save drop rule');
+			return false;
+		}
+		$row = db_fetch_array($res);
 
 		if( $row ) {
 			// update rule
 			$res = db_query_params (
-                                "UPDATE plugin_taskboard_columns_sources SET target_resolution=$1, alert=$2, autoassign=$3
-                                WHERE taskboard_column_source_id=$4
-                                ",
-                                array (
-                                        $target_resolution,
-                                        $alert,
-                                        $autoassign,
+				"UPDATE plugin_taskboard_columns_sources SET target_resolution=$1, alert=$2, autoassign=$3
+				WHERE taskboard_column_source_id=$4",
+				array (
+					$target_resolution,
+					$alert,
+					$autoassign,
 					$row['taskboard_column_source_id']
-                                )
-                        ) ;
-
+				)
+			) ;
 		} else {
 			// insert rule
 			$res = db_query_params (
-                                "INSERT INTO plugin_taskboard_columns_sources(target_taskboard_column_id, source_taskboard_column_id, target_resolution, alert, autoassign) 
-				VALUES($1,$source_column_id,$2,$3,$4)
-                                ",
-                                array (
+				"INSERT INTO plugin_taskboard_columns_sources(target_taskboard_column_id, source_taskboard_column_id, target_resolution, alert, autoassign) 
+				VALUES($1,$source_column_id,$2,$3,$4)",
+				 array (
 					$this->getTargetColumnID(),
 					$target_resolution, 
 					$alert, 
 					$autoassign 
 				)
-                	) ;
+			) ;
 		}
 
 		if( !$res ) {
@@ -243,11 +237,11 @@ class TaskBoardColumnSource extends Error {
 	}
 
 	/**
-         *      drop task
-         *
-         *      @return string    error message if cannot drop
-         */
-        function drop(&$task) {
+	 *      drop task
+	 *
+	 *      @return string    error message if cannot drop
+	 */
+	function drop(&$task) {
 		$msg = '';
 
 		$assigned_to = NULL;

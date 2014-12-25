@@ -41,14 +41,14 @@ if( $taskboard->getID() ) {
 	echo '</p>';
 
 	echo '<p>' . util_make_link ('/plugins/taskboard/admin/?group_id='.$group_id.'&amp;action=columns',
-                             '<strong>'._('Configure Columns').'</strong>').'<br />' ;
+		'<strong>'._('Configure Columns').'</strong>').'<br />' ;
 	echo _('Configure taskboard columns.') ;
 	echo '</p>';
 } else {
 	echo '<p>' . util_make_link ('/plugins/taskboard/admin/?group_id='.$group_id.'&amp;action=init',
-                             '<strong>'._('Initialize taskboard').'</strong>').'<br />' ;
-        echo _('Create initial taskboard configuration') ;
-        echo '</p>';
+		'<strong>'._('Initialize taskboard').'</strong>').'<br />' ;
+	echo _('Create initial taskboard configuration') ;
+	echo '</p>';
 
 }
 
