@@ -30,10 +30,10 @@
 }
 
 .agile-sticker-container {
-    padding: 10px;
-    float: left;
-    margin-left: auto;
-    margin-right: auto;
+	padding: 10px;
+	float: left;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .agile-sticker {
@@ -41,9 +41,9 @@
 	width: 230px;
 	/* border: solid #CCCCCC 1px; */
 	height: 130px;
-    -moz-box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-    -webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+	-moz-box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+	box-shadow: 0 4px 8px rgba(0,0,0,0.5);
 }
 
 .agile-sticker-header, .agile-sticker-footer {
@@ -76,8 +76,8 @@
 }
 
 .agile-phase-hovered {
-  background-color: #EEEEEE;
-  opacity: 0.75;
+	background-color: #EEEEEE;
+	opacity: 0.75;
 }
 
 #new-task-dialog div {

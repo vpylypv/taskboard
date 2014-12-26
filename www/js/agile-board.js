@@ -11,45 +11,45 @@ function showMessage( msg_text, msg_class) {
 function loadTaskboard( group_id ) {
 	var assigned_to = jQuery('select[name="_assigned_to"]').val();
 	var data = {
-                        action   : 'load_taskboard',
-                        group_id : group_id,
+			action   : 'load_taskboard',
+			group_id : group_id,
 			assigned_to : assigned_to
-        };
+		};
 
-        jQuery.ajax({
-                type: 'POST',
-                url: '/plugins/taskboard/ajax.php',
-                dataType: 'json',
-                data : data, 
-                async: false
-        }).done(function( answer ) {
-			 jQuery('#agile-board tbody').html('');
+	jQuery.ajax({
+		type: 'POST',
+		url: '/plugins/taskboard/ajax.php',
+		dataType: 'json',
+		data : data, 
+		async: false
+	}).done(function( answer ) {
+		jQuery('#agile-board tbody').html('');
 
-                        if(answer['message']) {
-                                showMessage(answer['message'], 'error');
-                        }
+		if(answer['message']) {
+			showMessage(answer['message'], 'error');
+		}
 
-                        aUserStories = answer['user_stories'];
-                        aPhases = answer['phases'];
+		aUserStories = answer['user_stories'];
+		aPhases = answer['phases'];
 
-                        jQuery( "#agile-board" ).append(
-                                drawUserStories()
-                        );
+		jQuery( "#agile-board" ).append(
+			drawUserStories()
+		);
 
-			jQuery( ".agile-toolbar-add-task" ).click( function(e) {
-				jQuery('#new-task-dialog input[name="user_story_id"]').val( jQuery(this).attr('user_story_id') );
-				jQuery('#new-task-dialog').dialog('open');
-				jQuery('.ui-widget-overlay').height( jQuery( document ).height() );
-				e.preventDefault();	
-			});
+		jQuery( ".agile-toolbar-add-task" ).click( function(e) {
+			jQuery('#new-task-dialog input[name="user_story_id"]').val( jQuery(this).attr('user_story_id') );
+			jQuery('#new-task-dialog').dialog('open');
+			jQuery('.ui-widget-overlay').height( jQuery( document ).height() );
+			e.preventDefault();	
+		});
 
-                        for(var i=0 ; i<aUserStories.length ; i++) {
-                                drawUserStory( aUserStories[i] );
-                        };
+		for(var i=0 ; i<aUserStories.length ; i++) {
+			drawUserStory( aUserStories[i] );
+		};
 
-			initUserStories();
-			initEditable();
-        });
+		initUserStories();
+		initEditable();
+	});
 }
 
 
@@ -127,20 +127,20 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 					if( l_oTargetPhase && l_nSourcePhaseId != nTargetPhaseId ) {
 							// try to drop card 
 							jQuery.ajax({
-                						type: 'POST',
-					                	url: '/plugins/taskboard/ajax.php',
-					                	dataType: 'json',
-					                	data : {
-					                        	action   : 'drop_card',
+								type: 'POST',
+								url: '/plugins/taskboard/ajax.php',
+								dataType: 'json',
+								data : {
+									action   : 'drop_card',
 									group_id : gGroupId,
-        					                	task_id : nTaskId,
+									task_id : nTaskId,
 									target_phase_id : nTargetPhaseId
-					                	},
-					                	async: false
-					        	}).done(function( answer ) {
-                        					if(answer['message']) {
-			                	                	showMessage(answer['message'], 'error');
-		        		                	}
+								},
+								async: false
+							}).done(function( answer ) {
+								if(answer['message']) {
+									showMessage(answer['message'], 'error');
+								}
 
 								if(answer['alert']) {
 									alert( answer['alert'] );
@@ -157,10 +157,11 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 								}
 
 								if( l_oUserStory ) {
-							                drawUserStory(l_oUserStory);
-							        }
+									drawUserStory(l_oUserStory);
+								}
+								
 								initEditable();
-        						});
+							});
 					}
 				}	
 			}			
@@ -170,55 +171,55 @@ function setPhase( nUserStoryId, nTaskId, nTargetPhaseId ) {
 
 function initUserStories() {
 	for( var i=0; i<aUserStories.length; i++ ) {
-        	initUserStory( aUserStories[i] );
+		initUserStory( aUserStories[i] );
 	}
 }
 
 function initUserStory( oUserStory ) {
 	for( var i=0; i<aPhases.length ; i++ ) {
-                if( aPhases[i].id != 'user-stories') {
-                        var sPhaseId = "#" + aPhases[i].id + "-" + oUserStory.id;
+		if( aPhases[i].id != 'user-stories') {
+			var sPhaseId = "#" + aPhases[i].id + "-" + oUserStory.id;
 
-                        //make phase droppable
-                        jQuery( sPhaseId )
-                                .data('phase_id', aPhases[i].id)
-                                .droppable( {
-                                      accept: '.agile-sticker-task-' + oUserStory.id,
-                                      hoverClass: 'agile-phase-hovered',
-                                      drop: helperTaskDrop
-                                } );
+			//make phase droppable
+			jQuery( sPhaseId )
+				.data('phase_id', aPhases[i].id)
+				.droppable( {
+					accept: '.agile-sticker-task-' + oUserStory.id,
+					hoverClass: 'agile-phase-hovered',
+					drop: helperTaskDrop
+				} );
 
-                        if( aPhases[i].background ) {
-                                jQuery("#" + aPhases[i].id + "-" + oUserStory.id).css('background-color', aPhases[i].background );
-                        }
-                }
-        }
+			if( aPhases[i].background ) {
+				jQuery("#" + aPhases[i].id + "-" + oUserStory.id).css('background-color', aPhases[i].background );
+			}
+		}
+	}
 }
 
 function drawUserStory( oUserStory ) {
 
 	for( var i=0; i<aPhases.length ; i++ ) {
-                if( aPhases[i].id != 'user-stories') {
-                        var sPhaseId = "#" + aPhases[i].id + "-" + oUserStory.id;
-                        jQuery( sPhaseId ).html(
-                                drawTasks( oUserStory, aPhases[i].id )
-                        );
-                }
-        }
+		if( aPhases[i].id != 'user-stories') {
+			var sPhaseId = "#" + aPhases[i].id + "-" + oUserStory.id;
+			jQuery( sPhaseId ).html(
+					drawTasks( oUserStory, aPhases[i].id )
+			);
+		}
+	}
 
 	for(var j=0 ; j<oUserStory.tasks.length ; j++) {
 		jQuery('#task-' + oUserStory.tasks[j].id)
 			.data('task_id', oUserStory.tasks[j].id)
 			.data('user_story_id', oUserStory.id)
 			.draggable( {
-			      containment: '#agile-board',
-			      //cursor: 'move',
-			      stack: 'div',
-			      revert: true,
-			      start: helperTaskStart,
-			      stop: helperTaskStop,
-			      helper: "clone",
-			      distance: 10
+				containment: '#agile-board',
+				//cursor: 'move',
+				stack: 'div',
+				revert: true,
+				start: helperTaskStart,
+				stop: helperTaskStop,
+				helper: "clone",
+				distance: 10
 			} );
 	}			
 }
@@ -230,11 +231,11 @@ function drawTasks( oUserStory, sPhaseId ) {
 		tsk = oUserStory.tasks[i];
 		if( taskInPhase( tsk, sPhaseId ) ) {
 			l_sHtml += '<div class="agile-sticker-container">';
-        	        l_sHtml += '<div class="agile-sticker agile-sticker-task agile-sticker-task-' + tsk.user_story + '" id="task-' + tsk.id + '" >';
-                	l_sHtml += '<div class="agile-sticker-header" style="background-color: ' + tsk.background + ';">';
-	                l_sHtml += '<a href="' + tsk.url  +  '" target="_blank">' + tsk.id + '</a> : <span>' + tsk.title + '</span>';
-        	        l_sHtml += "</div>\n";
-                	l_sHtml += '<div class="agile-sticker-body">' + tsk.description + '</div>';
+			l_sHtml += '<div class="agile-sticker agile-sticker-task agile-sticker-task-' + tsk.user_story + '" id="task-' + tsk.id + '" >';
+			l_sHtml += '<div class="agile-sticker-header" style="background-color: ' + tsk.background + ';">';
+			l_sHtml += '<a href="' + tsk.url  +  '" target="_blank">' + tsk.id + '</a> : <span>' + tsk.title + '</span>';
+			l_sHtml += "</div>\n";
+			l_sHtml += '<div class="agile-sticker-body">' + tsk.description + '</div>';
  			l_sHtml += "</div></div>\n";
 		}
 	}
@@ -243,9 +244,9 @@ function drawTasks( oUserStory, sPhaseId ) {
 }
 
 function taskInPhase( tsk, phase ) {
- 	if( tsk.phase_id ==  phase) {
-        	return true;
-        }
+	if( tsk.phase_id ==  phase) {
+		return true;
+	}
 
 	for( var i=0; i<aPhases.length; i++) {
 		if( aPhases[i].id == phase && aPhases[i].resolutions ) {
@@ -265,57 +266,58 @@ function initEditable() {
 	jQuery("div.agile-sticker-header span").dblclick( function () {
 		if( jQuery(this).children('input').length == 0 ) {	
 			jQuery('#text_description').trigger('focusout');
-                        jQuery('#text_title').trigger('focusout');
+			jQuery('#text_title').trigger('focusout');
 
 
 			var l_oTitle = jQuery(this);
 			var l_sTitle = l_oTitle.text();
-                        var l_nTaskId = jQuery(this).parent().parent().data('task_id');
+			var l_nTaskId = jQuery(this).parent().parent().data('task_id');
 
 			jQuery(this).html( '<input id="text_title" name="title" type="text">');
-			jQuery('#text_title').val( l_sTitle ).css('width', '80%').focus().focusout(function() {
-				l_oTitle.text( l_sTitle );
-			}) ;
-
+			jQuery('#text_title')
+				.val( l_sTitle )
+				.css('width', '80%')
+				.focus()
+				.focusout(function() {
+					l_oTitle.text( l_sTitle );
+				}) ;
 
 			jQuery('#text_title').keydown(function(e) {
 				if( e.keyCode == 27 ) {
-                                        // ESC == cancel
-                                        l_oTitle.text( l_sTitle );
-                                        e.preventDefault();
-                                }  else if ( e.keyCode == 13 && !e.shiftKey) {
-                                        e.preventDefault();
-                                        // ENTER - submit
-                                        var textField = this;
-                                                        jQuery.ajax({
-                                                                type: 'POST',
-                                                                url: '/plugins/taskboard/ajax.php',
-                                                                dataType: 'json',
-                                                                data : {
-                                                                        action   : 'update',
-                                                                        group_id : gGroupId,
-                                                                        task_id : l_nTaskId,
-                                                                        title : jQuery(this).val()
-                                                                },
-                                                                async: true
-                                                        }).done(function( answer ) {
-                                                                if(answer['message']) {
-                                                                        showMessage(answer['message'], 'error');
-                                                                }
+					// ESC == cancel
+					l_oTitle.text( l_sTitle );
+					e.preventDefault();
+				} else if ( e.keyCode == 13 && !e.shiftKey) {
+					e.preventDefault();
+					// ENTER - submit
+					var textField = this;
+					jQuery.ajax({
+						type: 'POST',
+						url: '/plugins/taskboard/ajax.php',
+						dataType: 'json',
+						data : {
+							action   : 'update',
+							group_id : gGroupId,
+							task_id : l_nTaskId,
+							title : jQuery(this).val()
+						},
+						async: true
+					}).done(function( answer ) {
+						if(answer['message']) {
+							showMessage(answer['message'], 'error');
+						}
 
-                                                                if(answer['action'] == 'reload') {
-                                                                        // reload whole board
-                                                                        loadTaskboard( gGroupId );
-                                                                }
+						if(answer['action'] == 'reload') {
+							// reload whole board
+							loadTaskboard( gGroupId );
+						}
 
-                                                                l_oTitle.html( jQuery(textField).val() );
-                                                        }).fail(function( jqxhr, textStatus, error ) {
-                                                                var err = textStatus + ', ' + error;
-                                                                alert(err);
-                                                        });
-
-                                }
- 
+						l_oTitle.html( jQuery(textField).val() );
+					}).fail(function( jqxhr, textStatus, error ) {
+						var err = textStatus + ', ' + error;
+						alert(err);
+					});
+				}
 			});
 		}
 	});
@@ -329,14 +331,19 @@ function initEditable() {
 
 
 			var l_oDesc = jQuery(this);
-	    		var l_sDescription = l_oDesc.html();
+			var l_sDescription = l_oDesc.html();
 			var l_nTaskId = jQuery(this).parent().data('task_id');
 			jQuery(this).html( '<textarea id="text_description" name="description" rows="11"></textarea>');
 
 			
-			jQuery('#text_description').html( l_sDescription.replace(/<br>/g, "\n") ).css('width', '98%').css('height', '95%').focus().focusout(function() {
-	 l_oDesc.html( l_sDescription );
-}) ;
+			jQuery('#text_description')
+				.html( l_sDescription.replace(/<br>/g, "\n") )
+				.css('width', '98%')
+				.css('height', '95%')
+				.focus()
+				.focusout(function() {
+					l_oDesc.html( l_sDescription );
+				}) ;
 			jQuery('#text_description').keydown(function(e) {
 				if( e.keyCode == 27 ) {
 					// ESC == cancel
@@ -346,33 +353,32 @@ function initEditable() {
 					e.preventDefault();
 					// ENTER - submit
 					var textField = this;
-							jQuery.ajax({
-                                                                type: 'POST',
-                                                                url: '/plugins/taskboard/ajax.php',
-                                                                dataType: 'json',
-                                                                data : {
-                                                                        action   : 'update',
-                                                                        group_id : gGroupId,
-                                                                        task_id : l_nTaskId,
-                                                                        desc : jQuery(this).val()
-                                                                },
-                                                                async: true 
-                                                        }).done(function( answer ) {
-                                                                if(answer['message']) {
-                                                                        showMessage(answer['message'], 'error');
-                                                                }
+					jQuery.ajax({
+						type: 'POST',
+						url: '/plugins/taskboard/ajax.php',
+						dataType: 'json',
+						data : {
+							action   : 'update',
+							group_id : gGroupId,
+							task_id : l_nTaskId,
+							desc : jQuery(this).val()
+						},
+						async: true 
+					}).done(function( answer ) {
+						if(answer['message']) {
+							showMessage(answer['message'], 'error');
+						}
 
-								if(answer['action'] == 'reload') {
-                                                                        // reload whole board
-                                                                        loadTaskboard( gGroupId );
-                                                                }
+						if(answer['action'] == 'reload') {
+							// reload whole board
+							loadTaskboard( gGroupId );
+						}
 
-								l_oDesc.text(jQuery(textField).val() );
-                                                        }).fail(function( jqxhr, textStatus, error ) {
-								var err = textStatus + ', ' + error;
-								alert(err);
-							});
-
+						l_oDesc.text(jQuery(textField).val() );
+					}).fail(function( jqxhr, textStatus, error ) {
+						var err = textStatus + ', ' + error;
+						alert(err);
+					});
 				}
 			});
 		}
