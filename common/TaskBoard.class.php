@@ -123,13 +123,13 @@ class TaskBoard extends Error {
 		 *
 		 *  @param array list of trackers IDs, linked to the taskboard
 		 *  @param array has of card background colors (key - tracker id, value - bg color)
-		 *  @param string Drop-down filter by this field is shown if specified. E.g., sprint or release.
+		 *  @param string Alias for of 'select' extra field used for release/sprint
 		 *  @param string Used for cost calculations together with remaining_cost_field_alias if specified
 		 *  @param string Used for cost calculations together with estimated_cost_field_alias if specified
 		 *
 		 *  @return     true on success / false on failure.
 		 */
-	function create( $trackers, $bgcolors, $filter_field_alias=NULL, 
+	function create( $trackers, $bgcolors, $release_field_alias=NULL, 
 			$estimated_cost_field_alias=NULL, $remaining_cost_field_alias=NULL,
 			$user_stories_tracker=NULL, $user_stories_reference_field=NULL, 
 			$user_stories_sort_field=NULL, $first_column_by_default=1) {
@@ -150,9 +150,9 @@ class TaskBoard extends Error {
 		db_begin();
 	
 		$sql = sprintf(
-			"INSERT INTO plugin_taskboard(group_id, filter_field_alias, estimated_cost_field_alias, remaining_cost_field_alias, user_stories_group_artifact_id, user_stories_reference_field_alias,user_stories_sort_field_alias, first_column_by_default) VALUES(%d,%s,%s,%s,%s,%s,%s, %d)", 
+			"INSERT INTO plugin_taskboard(group_id, release_field_alias, estimated_cost_field_alias, remaining_cost_field_alias, user_stories_group_artifact_id, user_stories_reference_field_alias,user_stories_sort_field_alias, first_column_by_default) VALUES(%d,%s,%s,%s,%s,%s,%s, %d)", 
 			$this->Group->getID(),
-			( $filter_field_alias ? "'$filter_field_alias'": 'NULL' ),
+			( $release_field_alias ? "'$release_field_alias'": 'NULL' ),
 			( $estimated_cost_field_alias ? "'$estimated_cost_field_alias'": 'NULL' ),
 			( $remaining_cost_field_alias ? "'$remaining_cost_field_alias'": 'NULL' ),
 			( $user_stories_tracker ? "$user_stories_tracker": 'NULL' ),
@@ -191,13 +191,13 @@ class TaskBoard extends Error {
 	 *
 	 *  @param array list of trackers IDs, linked to the taskboard
 	 *  @param array has of card background colors (key - tracker id, value - bg color)
-	 *  @param string Drop-down filter by this field is shown if specified. E.g., sprint or release.
+	 *  @param string Alias for of 'select' extra field used for release/sprint
 	 *  @param string Used for cost calculations together with remaining_cost_field_alias if specified
 	 *  @param string Used for cost calculations together with estimated_cost_field_alias if specified
 	 *
 	 *  @return     true on success / false on failure.
 	 */
-	function update( $trackers, $bgcolors, $filter_field_alias=NULL,
+	function update( $trackers, $bgcolors, $release_field_alias=NULL,
 			$estimated_cost_field_alias=NULL, $remaining_cost_field_alias=NULL,
 			$user_stories_tracker=NULL, $user_stories_reference_field=NULL, $user_stories_sort_field=NULL, $first_column_by_default=1 ) {
 		//
@@ -217,8 +217,8 @@ class TaskBoard extends Error {
 		db_begin();
 
 		$sql = sprintf(
-			"UPDATE plugin_taskboard SET filter_field_alias=%s, estimated_cost_field_alias=%s, remaining_cost_field_alias=%s, user_stories_group_artifact_id=%s, user_stories_reference_field_alias=%s, user_stories_sort_field_alias=%s, first_column_by_default=%d WHERE taskboard_id=%d",
-			( $filter_field_alias ? "'$filter_field_alias'": 'NULL' ),
+			"UPDATE plugin_taskboard SET release_field_alias=%s, estimated_cost_field_alias=%s, remaining_cost_field_alias=%s, user_stories_group_artifact_id=%s, user_stories_reference_field_alias=%s, user_stories_sort_field_alias=%s, first_column_by_default=%d WHERE taskboard_id=%d",
+			( $release_field_alias ? "'$release_field_alias'": 'NULL' ),
 			( $estimated_cost_field_alias ? "'$estimated_cost_field_alias'": 'NULL' ),
 			( $remaining_cost_field_alias ? "'$remaining_cost_field_alias'": 'NULL' ),
 			( $user_stories_tracker ? "$user_stories_tracker": 'NULL' ),
@@ -334,12 +334,12 @@ class TaskBoard extends Error {
 	}
 
 	/**
-	 *      getFilterField - get alias of field, used for taskboard filer
+	 *      getReleaseField - get alias of field, used for release/sprint
 	 *
 	 *      @return string     extra field alias
 	 */
-	function getFilterField() {
-		return $this->data_array['filter_field_alias'];
+	function getReleaseField() {
+		return $this->data_array['release_field_alias'];
 	}
 
 	/**
@@ -534,6 +534,8 @@ class TaskBoard extends Error {
 			}
 		}
 
+		// TODO TOTHINK - either show user stories where tasks linked to release, or user stories, linked to release
+		// so one US - one release
 		$us = $this->TrackersAdapter->getUserStories($release);
 		foreach( $us as $story) {
 			$stories[$story->getID()] = array(
@@ -557,14 +559,23 @@ class TaskBoard extends Error {
 	
 		$tasks_trackers = $this->getUsedTrackersData()	;
 		foreach( $tasks_trackers as $tasks_tracker_data ) {
-			$tasks = $this->TrackersAdapter->getTasks($tasks_tracker_data['group_artifact_id'], $release,$assigned_to);
+			$tasks = $this->TrackersAdapter->getTasks($tasks_tracker_data['group_artifact_id'], $assigned_to, $this->getReleaseField() ,$release);
 			foreach( $tasks as $task ) {
 				$task_maped = $this->getMappedTask( $task );
 				$stories[intval($task_maped['user_story'])]['tasks'][] = $task_maped ;
 			}
 		}
 
-		$ret_stories = array_values($stories);
+		$but = array_values($stories);
+		
+		//leav only stories, having not empty tasks list
+		$ret_stories = array();
+		foreach( $but as $us ) {
+			if( count( $us['tasks'] ) > 0 ) {
+				$ret_stories[] = $us;
+			}
+		}
+		
 		usort( $ret_stories, array( $this, 'sortUserStories' ) );
 
 		return $ret_stories;
@@ -718,29 +729,31 @@ class TaskBoard extends Error {
 
 		return true;
 	}
-
-	function getAvailableResolutions() {
-		$resolutions = array();
-
+	
+	function getExtraFieldValues($extra_field_alias) {
+		$ret = array();
+	
 		$tasks_trackers = $this->getUsedTrackersIds()  ;
 		foreach( $tasks_trackers as $tracker_id ) {
-			$ef_values = $this->TrackersAdapter->getResolutionValues($tracker_id);
-			if( count($resolutions) == 0 ) {
-				foreach( $ef_values as $v) {
-					$resolutions[] = $v;
-				}
+			$ef_values = $this->TrackersAdapter->getExtraFieldValues($tracker_id, $extra_field_alias);
+			if( count($ret) == 0 ) {
+				$ret = $ef_values;
 			} else {
 				$buf = array();
-				foreach( $resolutions as $r ) {
-					if( in_array( $r, $ef_values ) ){
-						$buf[] = $r;
+				foreach( $ret as $name => $id ) {
+					if( array_key_exists( $name, $ef_values ) ){
+						$buf[$name] = $id;
 					}
 				}
-				$resolutions = $buf;
+				$ret = $buf;
 			}
 		}
+	
+		return $ret;
+	}
 
-		return $resolutions;	
+	function getAvailableResolutions() {
+		return array_keys( $this->getExtraFieldValues('resolution') );
 	}
 
 	function getUnusedResolutions() {
@@ -750,7 +763,7 @@ class TaskBoard extends Error {
 
 		$tasks_trackers = $this->getUsedTrackersIds()  ;
 		foreach( $tasks_trackers as $tracker_id ) {
-			$ef_values = $this->TrackersAdapter->getResolutionValues($tracker_id);
+			$ef_values = array_keys( $this->TrackersAdapter->getExtraFieldValues($tracker_id, 'resolution') );
 			if( count($resolutions) == 0 ) {
 				foreach( $ef_values as $v) {
 					$resolutions[] = $v;

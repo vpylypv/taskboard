@@ -38,7 +38,7 @@ class TaskBoardBasicAdapter {
 	var $_ust=NULL; // user stories tracker
 	var $_tt=array(); // tasks trackers
 	var $_fields=array();
-	var $_res=array(); // hash os resolution values element_id => element_name
+	var $_elements=array(); // hash of extra fields values tracker_id => extra_field_id => element_name => element_id
 
 	function TaskBoardBasicAdapter($TaskBoard) {
 		$this->TaskBoard = $TaskBoard;
@@ -114,35 +114,42 @@ class TaskBoardBasicAdapter {
 
 		return $this->_fields[$tracker_id];
 	}
-
+	
 	/**
 	 *
 	 */
-	function getResolutionValues($tracker_id) {
+	function getExtraFieldValues($tracker_id, $field_alias ) {
 		$ret = array();
-
-		if( !array_key_exists($tracker_id, $this->_res) ) {
-			$at = $this->getTasksTracker($tracker_id);
-
-			$extra_fields = $at->getExtraFields();
-			foreach($extra_fields as $f) {
-				if( $f['alias'] == 'resolution' ) {
-					$ef = new ArtifactExtraField($at, $f);
-					foreach( $ef->getAvailableValues() as $v) {
-						$ret[ $v['element_name'] ] = $v['element_id'];
-					}
-					$this->_res[$tracker_id] = $ret;
+		
+		$fields = $this->getFieldsIds($tracker_id);
+	
+		$extra_field_id = $fields[$field_alias];
+		if( $extra_field_id ) {
+			if( !array_key_exists($tracker_id, $this->_elements) ) {
+				$this->_elements[$tracker_id] = array();
+			}
+				
+			if( !array_key_exists($extra_field_id, $this->_elements[$tracker_id]) ) {
+				$this->_elements[$tracker_id][$extra_field_id] = array();
+				$at = $this->getTasksTracker($tracker_id);
+				
+				$elements = $at->getExtraFieldElements($extra_field_id);
+				foreach($elements as $e) {
+					$this->_elements[$tracker_id][$extra_field_id][$e['element_name']] = $e['element_id'];
 				}
 			}
+			
+			$ret = $this->_elements[$tracker_id][$extra_field_id];
+				
 		}
-
-		return array_keys( $this->_res[$tracker_id] );
+	
+		return $ret;
 	}
 
 	/**
 	 *
 	 */
-	function getTasks($tracker_id,$release=NULL,$assigned_to=NULL) {
+	function getTasks($tracker_id,$assigned_to=NULL, $release_field_alias=NULL, $release_value=NULL) {
 		$tasks = array();
 
 		$at = $this->getTasksTracker($tracker_id);
@@ -155,7 +162,21 @@ class TaskBoardBasicAdapter {
 			}
 
 			$_status = 1;
-			$af->setup(NULL,NULL,NULL,NULL,'agileboard',$assigned_to,$_status,NULL);
+			$extra_fields = array();
+
+			if( $release_field_alias  && $release_value ) {
+				
+				
+				$fields = $this->getFieldsIds($tracker_id);
+				$extra_field_id = $fields[$release_field_alias];
+				
+				$elements = $this->getExtraFieldValues($tracker_id, $release_field_alias);
+				if( array_key_exists($release_value, $elements) ) {
+					$extra_fields[$extra_field_id] = $elements[$release_value];
+				}
+			}
+
+			$af->setup(NULL,NULL,NULL,NULL,'agileboard',$assigned_to,$_status,$extra_fields);
 
 			$tasks = $af->getArtifacts();
 		}
@@ -209,17 +230,14 @@ class TaskBoardBasicAdapter {
 		$tracker_id = $artifact->ArtifactType->getID();
 		$extra_fields = $artifact->getExtraFieldData();
 
-		if( !array_key_exists($tracker_id, $this->_res) ) {
-			$this->getResolutionValues($tracker_id);
-		}
-
 		$fields_ids = $this->getFieldsIds( $tracker_id );
 
 		if( array_key_exists( 'resolution', $fields_ids ) ) {
+			$elements = $this->getExtraFieldValues($tracker_id, 'resolution');
 			$resolution_field_id = $fields_ids['resolution'];
 
-			if( array_key_exists( $resolution, $this->_res[$tracker_id] ) ){
-				$extra_fields[ $resolution_field_id ] = $this->_res[$tracker_id][$resolution]; 
+			if( array_key_exists( $resolution, $elements ) ){
+				$extra_fields[ $resolution_field_id ] = $elements[$resolution]; 
 			}
 		}
 

@@ -10,10 +10,12 @@ function showMessage( msg_text, msg_class) {
 
 function loadTaskboard( group_id ) {
 	var assigned_to = jQuery('select[name="_assigned_to"]').val();
+	var release = jQuery('select[name="_release"]').val();
 	var data = {
 			action   : 'load_taskboard',
 			group_id : group_id,
-			assigned_to : assigned_to
+			assigned_to : assigned_to,
+			release : release
 		};
 
 	jQuery.ajax({

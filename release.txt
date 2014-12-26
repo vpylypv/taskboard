@@ -2,6 +2,9 @@
 0.2.0 - AgileBoard rendering
 0.3.0 - tasks drag'n'drop
 0.4.0 - tasks and user stories simple creation
-0.5.0 - releases management & burndown chart
+0.5.0 - releases management & burndown chart, progress bar, team velocity, may be other metrics
 0.6.0 - mandatory field && popup form for tasks (e.g., when some mandatory fields are missing)
 0.7.0 - specify drop rules for particular source columns
+0.8.0 - extra fields synchronization (for using the same values for resolution/release)
+...
+1.0.0 - champaign!

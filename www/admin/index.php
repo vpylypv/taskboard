@@ -20,7 +20,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-require_once $gf."env.inc.php";
+
+require_once "env.inc.php";
 require_once $gfcommon.'include/pre.php';
 require_once $gfconfig.'plugins/taskboard/config.php' ;
 

@@ -43,7 +43,7 @@ if ($at_arr === false || !count($at_arr) ) {
 
 $trackers_selected = array();
 $trackers_bgcolor  = array();
-$filter_field  = '';
+$release_field  = '';
 $estimated_cost_field = $plugins_taskboard_estimated_cost_field_init;
 $remaining_cost_field = $plugins_taskboard_remaining_cost_field_init;
 $user_stories_tracker = '';
@@ -71,7 +71,7 @@ if( $taskboard->getID() ) {
 	foreach( $taskboard->getUsedTrackersData() as $used_tracker_data ) {
 		$trackers_selected[] = $used_tracker_data['group_artifact_id'];
 		$trackers_bgcolor[ $used_tracker_data['group_artifact_id'] ] = $used_tracker_data['card_background_color'];
-		$filter_field = $taskboard->getFilterField();
+		$release_field = $taskboard->getReleaseField();
 		$estimated_cost_field = $taskboard->getEstimatedCostField();
 		$remaining_cost_field = $taskboard->getRemainingCostField();
 		$user_stories_tracker = $taskboard->getUserStoriesTrackerID();
@@ -85,7 +85,7 @@ if( $taskboard->getID() ) {
 if (getStringFromRequest('post_changes')) {
 	$trackers_selected = getArrayFromRequest('use', array());
 	$trackers_bgcolor  = getArrayFromRequest('bg', array());
-	$filter_field = getStringFromRequest('filter_field','');
+	$release_field = getStringFromRequest('release_field','');
 	$estimated_cost_field = getStringFromRequest('estimated_cost_field','');
 	$remaining_cost_field = getStringFromRequest('remaining_cost_field','');
 	$user_stories_tracker = getStringFromRequest('user_stories_tracker','');
@@ -95,9 +95,9 @@ if (getStringFromRequest('post_changes')) {
 
 	// try to save data
 	if( $taskboard->getID() ) {
-		$ret = $taskboard->update( $trackers_selected, $trackers_bgcolor, $filter_field, $estimated_cost_field, $remaining_cost_field, $user_stories_tracker, $user_stories_reference_field, $user_stories_sort_field, $first_column_by_default);
+		$ret = $taskboard->update( $trackers_selected, $trackers_bgcolor, $release_field, $estimated_cost_field, $remaining_cost_field, $user_stories_tracker, $user_stories_reference_field, $user_stories_sort_field, $first_column_by_default);
 	} else {
-		$ret = $taskboard->create( $trackers_selected, $trackers_bgcolor, $filter_field, $estimated_cost_field, $remaining_cost_field, $user_stories_tracker, $user_stories_reference_field, $user_stories_sort_field, $first_column_by_default);
+		$ret = $taskboard->create( $trackers_selected, $trackers_bgcolor, $release_field, $estimated_cost_field, $remaining_cost_field, $user_stories_tracker, $user_stories_reference_field, $user_stories_sort_field, $first_column_by_default);
 	}
 
 	if( !$ret ) {
@@ -150,7 +150,7 @@ if(  count($at_arr) > 0 ) {
 ?>
 <table>
 	<tr><td><strong><?php echo _('Use first column by default') ?></strong></td><td><input name="first_column_by_default" type="checkbox" <?= ($first_column_by_default? 'checked' : '')  ?> value="1"></td></tr>
-	<tr><td><strong><?php echo _('Filter field') ?></strong></td><td><select name="filter_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('Release/sprint field') ?></strong></td><td><select name="release_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
 	<tr><td><strong><?php echo _('Estimated cost field') ?></strong></td><td><select name="estimated_cost_field"><option option value=""><?= _('Not defined') ?></option></select></td></tr>
 	<tr><td><strong><?php echo _('Remaining cost field') ?></strong></td><td><select name="remaining_cost_field"><option option value=""><?= _('Not defined') ?></option></select></td></tr>
 </table>
@@ -268,9 +268,9 @@ jQuery(function($){
 			}
 
 			if( answer['common_selects'] ) {
-				var selected = $('select[name=filter_field] option:selected').val();
+				var selected = $('select[name=release_field] option:selected').val();
 				if( !selected ) {
-					selected = '<?= $filter_field ?>';
+					selected = '<?= $release_field ?>';
 				}
 
 				var str = '<option value=""><?= _('Not defined') ?></option>';
@@ -278,7 +278,7 @@ jQuery(function($){
 				{
 					str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
 				});
-				$('select[name=filter_field]').empty().html(str);
+				$('select[name=release_field]').empty().html(str);
 			}
 
 			if( answer['common_texts'] ) {

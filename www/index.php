@@ -113,13 +113,37 @@ if (is_array($_assigned_to)) {
 $tech_box=html_build_select_box_from_arrays ($tech_id_arr,$tech_name_arr,'_assigned_to',$_assigned_to,true,_('Unassigned'));
 // end of the stolen code
 
+$release_box = '';
+if( $taskboard->getReleaseField() ) {
+	$release_field_alias = $taskboard->getReleaseField();
+	$current_release = '' ; //TODO - initialize with real current release
+	
+	$releases = $taskboard->getExtraFieldValues($release_field_alias);
+
+	if( $releases ) {
+		$release_id_arr = array();
+		$release_name_arr = array();
+		foreach( $releases as $release_name => $release_id ) {
+			$release_id_arr[] = $release_name;
+			$release_name_arr[] = $release_name;
+		}
+		
+		$release_box=html_build_select_box_from_arrays ($release_id_arr,$release_name_arr,'_release',$current_release,false);
+	}
+}
 ?>
 
 
 <div class="tabbertab'.($af->query_type == 'custom' ? ' tabbertabdefault' : '').'" title="'._('Simple Filtering and Sorting').'">
 	<form action="'. getStringFromServer('PHP_SELF') .'?group_id='.$group_id.'&amp;atid='.$ath->getID().'" method="post">
-		<table width="100%" cellspacing="0">
+		<table cellspacing="0">
 			<tr>
+		<?php if( $release_box ) { ?>
+
+				<td>
+					<?php echo _('Sprint/Release').':&nbsp;'. $release_box ; ?>
+				</td>
+		<?php } ?>
 				<td>
 					<?php echo _('Assignee').':&nbsp;'. $tech_box ; ?>
 				</td>
@@ -196,7 +220,7 @@ aPhases = []
 jQuery( document ).ready(function( $ ) {
 	loadTaskboard( <?php echo $group_id ?> );
 
-	jQuery('select[name="_assigned_to"]').change(function () {
+	jQuery('select[name="_assigned_to"], select[name="_release"]').change(function () {
 		loadTaskboard( <?php echo $group_id ?> );
 	});
 

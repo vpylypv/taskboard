@@ -50,20 +50,25 @@ for ($j = 0; $j < count($at_arr); $j++) {
 
 		if( in_array( $tracker_id, $used_trackers ) ) {
 			// select common 'select' fields
-			$fields = $at_arr[$j]->getExtraFields();
+			$fields = $at_arr[$j]->getExtraFields( $allowed_types );
 			$tmp = array();
 			foreach( $allowed_types as $allowed_type) {
 				$tmp[$allowed_type] = array();
 			}
+
 			foreach( $fields as $field) {
-				if( $init ) {
-					if( in_array( $field['field_type'], $allowed_types) ) {
-						$tmp[ $field['field_type'] ][ $field['alias'] ] = $field['field_name'];
+				// exclude 'resolution' field
+				if( $field['alias'] != 'resolution' ) {
+					if( $init ) {
+						if( in_array( $field['field_type'], $allowed_types) ) {
+							$tmp[ $field['field_type'] ][ $field['alias'] ] = $field['field_name'];
+						}
+					} elseif( 
+						in_array( $field['alias'], array_keys( $common_fields[ $field['field_type'] ]) ) && 
+						in_array( $field['field_type'], $allowed_types)
+						) {
+						$tmp[ $field['field_type'] ][$field['alias']] = $field['field_name'];
 					}
-				} elseif( 
-					in_array( $field['alias'], array_keys( $common_fields[ $field['field_type'] ]) ) && 
-					in_array( $field['field_type'], $allowed_types) ) {
-					$tmp[ $field['field_type'] ][$field['alias']] = $field['field_name'];
 				}
 			}
 			$common_fields = $tmp;

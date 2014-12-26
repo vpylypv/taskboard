@@ -25,7 +25,7 @@ $ret = array();
 $columns = $taskboard->getColumns();
 $ret['message'] = '';
 
-$release = getIntFromRequest('release', NULL);
+$release = getStringFromRequest('release', NULL);
 $assigned_to = getIntFromRequest('assigned_to', NULL);
 
 if( !$assigned_to ) {
