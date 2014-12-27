@@ -50,11 +50,8 @@ function loadTaskboard( group_id ) {
 		};
 
 		initUserStories();
-		
-		// only tracker manager can modify tasks
-		if( gIsManager ) {
-			initEditable();
-		}
+
+		initEditable();
 	});
 }
 
@@ -273,6 +270,11 @@ function taskInPhase( tsk, phase ) {
 }
 
 function initEditable() {
+	// only tracker manager can modify tasks
+	if( !gIsManager ) {
+		return;
+	}
+
 	// title
 	jQuery("div.agile-sticker-header span").dblclick( function () {
 		if( jQuery(this).children('input').length == 0 ) {	

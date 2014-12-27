@@ -118,7 +118,7 @@ if( $taskboard->getReleaseField() ) {
 	$release_field_alias = $taskboard->getReleaseField();
 	$current_release = '' ; //TODO - initialize with real current release
 	
-	$releases = $taskboard->getExtraFieldValues($release_field_alias);
+	$releases = $taskboard->getReleaseValues();
 
 	if( $releases ) {
 		$release_id_arr = array();

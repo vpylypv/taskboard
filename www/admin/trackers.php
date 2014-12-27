@@ -44,6 +44,7 @@ if ($at_arr === false || !count($at_arr) ) {
 $trackers_selected = array();
 $trackers_bgcolor  = array();
 $release_field  = '';
+$release_field_tracker  = 1;
 $estimated_cost_field = $plugins_taskboard_estimated_cost_field_init;
 $remaining_cost_field = $plugins_taskboard_remaining_cost_field_init;
 $user_stories_tracker = '';
@@ -72,6 +73,7 @@ if( $taskboard->getID() ) {
 		$trackers_selected[] = $used_tracker_data['group_artifact_id'];
 		$trackers_bgcolor[ $used_tracker_data['group_artifact_id'] ] = $used_tracker_data['card_background_color'];
 		$release_field = $taskboard->getReleaseField();
+		$release_field_tracker = $taskboard->getReleaseFieldTracker();
 		$estimated_cost_field = $taskboard->getEstimatedCostField();
 		$remaining_cost_field = $taskboard->getRemainingCostField();
 		$user_stories_tracker = $taskboard->getUserStoriesTrackerID();
@@ -86,18 +88,19 @@ if (getStringFromRequest('post_changes')) {
 	$trackers_selected = getArrayFromRequest('use', array());
 	$trackers_bgcolor  = getArrayFromRequest('bg', array());
 	$release_field = getStringFromRequest('release_field','');
+	$release_field_tracker = getIntFromRequest('release_field_tracker',1);
 	$estimated_cost_field = getStringFromRequest('estimated_cost_field','');
 	$remaining_cost_field = getStringFromRequest('remaining_cost_field','');
 	$user_stories_tracker = getStringFromRequest('user_stories_tracker','');
 	$user_stories_reference_field = getStringFromRequest('user_stories_reference_field','');
 	$user_stories_sort_field = getStringFromRequest('user_stories_sort_field','');
-	$first_column_by_default = getStringFromRequest('first_column_by_default','0');
+	$first_column_by_default = getIntFromRequest('first_column_by_default','0');
 
 	// try to save data
 	if( $taskboard->getID() ) {
-		$ret = $taskboard->update( $trackers_selected, $trackers_bgcolor, $release_field, $estimated_cost_field, $remaining_cost_field, $user_stories_tracker, $user_stories_reference_field, $user_stories_sort_field, $first_column_by_default);
+		$ret = $taskboard->update( $trackers_selected, $trackers_bgcolor, $release_field, $release_field_tracker, $estimated_cost_field, $remaining_cost_field, $user_stories_tracker, $user_stories_reference_field, $user_stories_sort_field, $first_column_by_default);
 	} else {
-		$ret = $taskboard->create( $trackers_selected, $trackers_bgcolor, $release_field, $estimated_cost_field, $remaining_cost_field, $user_stories_tracker, $user_stories_reference_field, $user_stories_sort_field, $first_column_by_default);
+		$ret = $taskboard->create( $trackers_selected, $trackers_bgcolor, $release_field, $release_field_tracker, $estimated_cost_field, $remaining_cost_field, $user_stories_tracker, $user_stories_reference_field, $user_stories_sort_field, $first_column_by_default);
 	}
 
 	if( !$ret ) {
@@ -121,11 +124,17 @@ if( count($at_arr) > 0 ) {
 <form action="/plugins/taskboard/admin/?group_id=<?php echo $group_id ?>&amp;action=trackers" method="post">
 <input type="hidden" name="post_changes" value="y">
 
+<table cellspacing="2" cellpadding="2" width="100%">
+<tr valign="top">
+	<td with="50%">
 <?php
+
+echo $HTML->boxTop(_("Tasks trackers"));
 
 if(  count($at_arr) > 0 ) {
 	$tablearr = array(_('Tracker'),_('Description'),_('Use'),_('Card background color'));
 
+	
 	echo $HTML->listTableTop($tablearr, false, 'sortable_table_tracker', 'sortable_table_tracker');
 	foreach( $trackers as $tracker ) {
 		$tracker_id = $tracker->getID();
@@ -149,18 +158,43 @@ if(  count($at_arr) > 0 ) {
 
 ?>
 <table>
-	<tr><td><strong><?php echo _('Use first column by default') ?></strong></td><td><input name="first_column_by_default" type="checkbox" <?php echo ($first_column_by_default? 'checked' : '')  ?> value="1"></td></tr>
-	<tr><td><strong><?php echo _('Release/sprint field') ?></strong></td><td><select name="release_field"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
 	<tr><td><strong><?php echo _('Estimated cost field') ?></strong></td><td><select name="estimated_cost_field"><option option value=""><?php echo _('Not defined') ?></option></select></td></tr>
 	<tr><td><strong><?php echo _('Remaining cost field') ?></strong></td><td><select name="remaining_cost_field"><option option value=""><?php echo _('Not defined') ?></option></select></td></tr>
 </table>
 
 
+
+	</td>
+	<td width="50%">
+
+<?php echo $HTML->boxTop(_("User story tracker")); ?>
+	
 <table>
 	<tr><td><strong><?php echo _('User stories tracker') ?></strong></td><td><select name="user_stories_tracker"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
 	<tr><td><strong><?php echo _('User stories reference field') ?></strong>&nbsp;<span id='usrefreq' <?php if( !$user_stories_tracker) { ?> style='display: none;' <?php } ?> ><?php echo utils_requiredField(); ?></span></td><td><select name="user_stories_reference_field"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
 	<tr><td><strong><?php echo _('User stories sorting field') ?></strong></td><td><select name="user_stories_sort_field"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
 </table>
+
+<?php echo $HTML->boxBottom(); ?>
+
+<?php echo $HTML->boxTop(_("General parameters")); ?>
+<table>
+	<tr><td><strong><?php echo _('Use first column by default') ?></strong></td><td><input name="first_column_by_default" type="checkbox" <?php echo ($first_column_by_default? 'checked' : '')  ?> value="1"></td></tr>
+</table>
+
+<?php echo $HTML->boxMiddle(_("Release/sprint management"));?>
+
+<table>
+	<tr><td><strong><?php echo _('Manage releases/sprints') ?></strong></td><td>
+		<input type="radio" name="release_field_tracker" value="1" id="release_tracker1" <?php echo ( $release_field_tracker!=2 ? 'checked' : '') ?>>&nbsp;<?php echo _('by tasks') ?><br>
+		<input type="radio" name="release_field_tracker" value="2" id="release_tracker2" <?php echo ( $release_field_tracker==2 ? 'checked' : '') ?>>&nbsp;<?php echo _('by user stories') ?></td></tr>
+	<tr><td><strong><?php echo _('Release/sprint field') ?></strong></td><td><select name="release_field"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
+</table>
+
+<?php echo $HTML->boxBottom(); ?>
+
+	</td>
+</tr></table>
 
 <p>
 	<input type="submit" name="post_changes" value="<?php echo _('Submit') ?>" />
@@ -236,6 +270,54 @@ jQuery(function($){
 				}
 	
 				$('select[name=user_stories_sort_field]').empty().html(str);
+			}
+		});
+	}
+
+	function loadReleaseField() {
+		var release_trackers = new Array();
+
+		if( $('input[type=radio][name=release_field_tracker]:checked').val() == 1 ) {
+			// load release from task trackers
+			$('input.use_tracker').each( function () {
+				if ( $(this).is(':checked') ) {
+					release_trackers.push( $(this).attr('value') );
+				}
+			});
+		} else {
+			// load field user story tracker
+			release_trackers = [ $('select[name=user_stories_tracker]').val() ];
+		}
+		
+		$.ajax({
+			type: 'POST',
+			url: '/plugins/taskboard/admin/ajax.php',
+			dataType: 'json',
+			data : {
+				action : 'get_trackers_fields',
+				group_id     : <?php echo $group_id ?>,
+				'trackers[]' : release_trackers
+			},
+			async: false
+		}).done(function( answer ) {
+			if(answer['message']) {
+				showMessage(answer['message'], 'error');
+			}
+
+			if( answer['common_selects'] ) {
+				var selected = $('select[name=release_field] option:selected').val();
+				if( !selected ) {
+					selected = '<?php echo $release_field ?>';
+				}
+
+				var str = '<option value=""><?php echo _('Not defined') ?></option>';
+				if( answer['common_selects'] ) {
+					$.each(answer['common_selects'], function(key, value) {
+						str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
+					});
+				}
+	
+				$('select[name=release_field]').empty().html(str);
 			}
 		});
 	}
@@ -337,16 +419,24 @@ jQuery(function($){
 	$('select[name=user_stories_tracker]').change( function () {
 		cleanMessages();
 		if( $(this).val() ) {
-			$('#usrefreq').show();
+			$('#usrefreq').show();			
 			$('select[name=user_stories_reference_field]').empty().html(user_story_ref_field);
+			$('#release_tracker2').prop("disabled", false);
 			loadUserStorySortFields();
 		} else {
 			$('#usrefreq').hide();
 			$('select[name=user_stories_reference_field]').empty().html('<option value=""><?php echo _('Not defined') ?></option>');
+			$('#release_tracker1').prop("checked", true);
+			$('#release_tracker2').prop("disabled", true);
 		}
+	});
+
+	$('input[type=radio][name=release_field_tracker]').change( function () {
+		loadReleaseField();
 	});
 
 	loadUserStoriesTrackers();
 	loadTrackersFields();
+	loadReleaseField();
 });
 </script>

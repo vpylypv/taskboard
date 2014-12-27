@@ -87,7 +87,7 @@ class TaskBoardBasicAdapter {
 	 *
 	 * @return   array
 	 */
-	function getUserStories($release=NULL) {
+	function getUserStories($release_value=NULL) {
 		$at = $this->getUserStoriesTracker();
 		$af = new ArtifactFactory($at);
 		if (!$af || !is_object($af)) {
@@ -97,7 +97,23 @@ class TaskBoardBasicAdapter {
 		}
 
 		$_status = 1;
-		$af->setup(NULL,NULL,NULL,NULL,'agileboard',NULL,$_status,NULL);
+		$extra_fields = array();
+
+		if( $release_value ) {
+			$release_field_alias = $this->TaskBoard->getReleaseField();
+		
+			if( $release_field_alias ) {
+				$fields = $this->getFieldsIds($at->getID());
+				$extra_field_id = $fields[$release_field_alias];
+			
+				$elements = $this->getExtraFieldValues($at->getID(), $release_field_alias);
+				if( array_key_exists($release_value, $elements) ) {
+					$extra_fields[$extra_field_id] = $elements[$release_value];
+				}
+			}
+		}
+
+		$af->setup(NULL,NULL,NULL,NULL,'agileboard',NULL,$_status,$extra_fields);
 
 		return $af->getArtifacts();
 	}
@@ -177,7 +193,7 @@ class TaskBoardBasicAdapter {
 	 *
 	 * @return   array
 	 */
-	function getTasks($tracker_id,$assigned_to=NULL, $release_value=NULL) {
+	function getTasks($tracker_id,$assigned_to=NULL, $release_value=NULL, $user_story_value=NULL ) {
 		$tasks = array();
 
 		$at = $this->getTasksTracker($tracker_id);
@@ -191,18 +207,27 @@ class TaskBoardBasicAdapter {
 
 			$_status = 1;
 			$extra_fields = array();
-			
-			$release_field_alias = $this->TaskBoard->getReleaseField();
+			$fields = $this->getFieldsIds($tracker_id);
 
-			if( $release_field_alias && $release_value ) {
+			if( $release_value ) {
+				$release_field_alias = $this->TaskBoard->getReleaseField();
 				
-				
-				$fields = $this->getFieldsIds($tracker_id);
-				$extra_field_id = $fields[$release_field_alias];
-				
-				$elements = $this->getExtraFieldValues($tracker_id, $release_field_alias);
-				if( array_key_exists($release_value, $elements) ) {
-					$extra_fields[$extra_field_id] = $elements[$release_value];
+				if( $release_field_alias ) {
+					$extra_field_id = $fields[$release_field_alias];
+					
+					$elements = $this->getExtraFieldValues($tracker_id, $release_field_alias);
+					if( array_key_exists($release_value, $elements) ) {
+						$extra_fields[$extra_field_id] = $elements[$release_value];
+					}
+				}
+			}
+
+			if( $user_story_value ) {
+				$user_story_field_alias = $this->TaskBoard->getUserStoriesReferenceField();
+			
+				if( $user_story_field_alias ) {
+					$extra_field_id = $fields[$user_story_field_alias];
+					$extra_fields[$extra_field_id] = $user_story_value;
 				}
 			}
 
@@ -327,7 +352,12 @@ class TaskBoardBasicAdapter {
 		
 		$user_id = user_getid();
 		if( $ret && ( $user_id == $assigned_to ) ) {
-			$ret = $artifact->assignToMe();
+			//$ret = $artifact->assignToMe();
+			$res = db_query_params ('UPDATE artifact SET assigned_to=$1 WHERE artifact_id=$2',
+					array ($user_id, $artifact->getID())) ;
+			if (!$res) {
+				return 'Error updating assigned_to in artifact: '.db_error();
+			}
 		}
 
 		if( !$ret ) {
@@ -343,7 +373,14 @@ class TaskBoardBasicAdapter {
 	 * @return    boolean
 	 */
 	function isManager () {
-		return true;
+		$ret = true;
+		$tasks_trackers = $this->TaskBoard->getUsedTrackersData();
+		foreach( $tasks_trackers as $tasks_tracker_data ) {
+			if (!forge_check_perm ('tracker', $tasks_tracker_data['group_artifact_id'], 'manager')) {
+				$ret = false;
+			}
+		}
+		return $ret;
 	}
 	
 	/**
@@ -352,7 +389,15 @@ class TaskBoardBasicAdapter {
 	 * @return    boolean
 	 */
 	function isTechnician () {
-		return true;
+		$ret = true;
+		$tasks_trackers = $this->TaskBoard->getUsedTrackersData();
+		foreach( $tasks_trackers as $tasks_tracker_data ) {
+			error_log($tasks_tracker_data['group_artifact_id']);
+			if (!forge_check_perm ('tracker', $tasks_tracker_data['group_artifact_id'], 'tech')) {
+				$ret = false;
+			}
+		}
+		return $ret;
 	}
 
 	/**

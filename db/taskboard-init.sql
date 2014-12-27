@@ -3,6 +3,7 @@ CREATE TABLE plugin_taskboard (
     taskboard_id SERIAL primary key,
     group_id integer  REFERENCES groups(group_id) ON DELETE CASCADE,
     release_field_alias text,
+    release_field_tracker integer NOT NULL default 1,
     estimated_cost_field_alias text,
     remaining_cost_field_alias text,
     user_stories_reference_field_alias text,
