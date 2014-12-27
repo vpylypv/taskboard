@@ -52,8 +52,8 @@ if( $confirmed ) {
 	}
 
 ?>
-	<form action="/plugins/taskboard/admin/?group_id=<?= $group_id ?>&amp;action=delete_column" method="post">
-	<input type="hidden" name="column_id" value="<?= $column_id ?>">
+	<form action="/plugins/taskboard/admin/?group_id=<?php echo $group_id ?>&amp;action=delete_column" method="post">
+	<input type="hidden" name="column_id" value="<?php echo $column_id ?>">
 
 	<h1><?php echo _('Column') ." '".$column->getTitle() ."'"; ?></h1>
 	<div>

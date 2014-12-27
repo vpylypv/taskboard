@@ -118,7 +118,7 @@ if( count($at_arr) > 0 ) {
 ?>
 
 <script type="text/javascript" src="/plugins/taskboard/js/agile-board.js"></script>
-<form action="/plugins/taskboard/admin/?group_id=<?= $group_id ?>&amp;action=trackers" method="post">
+<form action="/plugins/taskboard/admin/?group_id=<?php echo $group_id ?>&amp;action=trackers" method="post">
 <input type="hidden" name="post_changes" value="y">
 
 <?php
@@ -149,17 +149,17 @@ if(  count($at_arr) > 0 ) {
 
 ?>
 <table>
-	<tr><td><strong><?php echo _('Use first column by default') ?></strong></td><td><input name="first_column_by_default" type="checkbox" <?= ($first_column_by_default? 'checked' : '')  ?> value="1"></td></tr>
-	<tr><td><strong><?php echo _('Release/sprint field') ?></strong></td><td><select name="release_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
-	<tr><td><strong><?php echo _('Estimated cost field') ?></strong></td><td><select name="estimated_cost_field"><option option value=""><?= _('Not defined') ?></option></select></td></tr>
-	<tr><td><strong><?php echo _('Remaining cost field') ?></strong></td><td><select name="remaining_cost_field"><option option value=""><?= _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('Use first column by default') ?></strong></td><td><input name="first_column_by_default" type="checkbox" <?php echo ($first_column_by_default? 'checked' : '')  ?> value="1"></td></tr>
+	<tr><td><strong><?php echo _('Release/sprint field') ?></strong></td><td><select name="release_field"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('Estimated cost field') ?></strong></td><td><select name="estimated_cost_field"><option option value=""><?php echo _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('Remaining cost field') ?></strong></td><td><select name="remaining_cost_field"><option option value=""><?php echo _('Not defined') ?></option></select></td></tr>
 </table>
 
 
 <table>
-	<tr><td><strong><?php echo _('User stories tracker') ?></strong></td><td><select name="user_stories_tracker"><option value=""><?= _('Not defined') ?></option></select></td></tr>
-	<tr><td><strong><?php echo _('User stories reference field') ?></strong>&nbsp;<span id='usrefreq' style='display: none;'><?= utils_requiredField(); ?></span></td><td><select name="user_stories_reference_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
-	<tr><td><strong><?php echo _('User stories sorting field') ?></strong></td><td><select name="user_stories_sort_field"><option value=""><?= _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('User stories tracker') ?></strong></td><td><select name="user_stories_tracker"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('User stories reference field') ?></strong>&nbsp;<span id='usrefreq' <?php if( !$user_stories_tracker) { ?> style='display: none;' <?php } ?> ><?php echo utils_requiredField(); ?></span></td><td><select name="user_stories_reference_field"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
+	<tr><td><strong><?php echo _('User stories sorting field') ?></strong></td><td><select name="user_stories_sort_field"><option value=""><?php echo _('Not defined') ?></option></select></td></tr>
 </table>
 
 <p>
@@ -186,10 +186,10 @@ jQuery(function($){
 	function loadUserStoriesTrackers() {
 		var selected = $('select[name=user_stories_tracker] option:selected').val();
 		if( !selected ) {
-			selected = '<?= $user_stories_tracker ?>';
+			selected = '<?php echo $user_stories_tracker ?>';
 		}
 
-		var str = '<option value=""><?= _('Not defined') ?></option>';
+		var str = '<option value=""><?php echo _('Not defined') ?></option>';
 		$.each(all_trackers, function(key, value) {
 			if( !$('input.use_tracker[value=' + value.id + ']').is(':checked') ) {
 				str +='<option value="'+ value.id +'"'+ ( value.id == selected ? 'selected' : '' ) +'>'+ value.name +'</option>';
@@ -207,7 +207,7 @@ jQuery(function($){
 			dataType: 'json',
 			data : {
 				action : 'get_trackers_fields',
-				group_id     : <?= $group_id ?>,
+				group_id     : <?php echo $group_id ?>,
 				'trackers[]' : [ $('select[name=user_stories_tracker]').val() ]
 			},
 			async: false
@@ -219,10 +219,10 @@ jQuery(function($){
 			if( answer['common_selects'] || answer['common_texts'] ) {
 				var selected = $('select[name=user_stories_sort_field] option:selected').val();
 				if( !selected ) {
-					selected = '<?= $user_stories_sort_field ?>';
+					selected = '<?php echo $user_stories_sort_field ?>';
 				}
 
-				var str = '<option value=""><?= _('Not defined') ?></option>';
+				var str = '<option value=""><?php echo _('Not defined') ?></option>';
 				if( answer['common_selects'] ) {
 					$.each(answer['common_selects'], function(key, value) {
 						str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
@@ -249,7 +249,7 @@ jQuery(function($){
 		});
 
 		if( trackers.length == 0 ) {
-			showMessage("<?= _('Choose at least one tracker for using with taskboard.') ?>", "warning");
+			showMessage("<?php echo _('Choose at least one tracker for using with taskboard.') ?>", "warning");
 		} 
 
 		$.ajax({
@@ -258,7 +258,7 @@ jQuery(function($){
 			dataType: 'json',
 			data : {
 				action : 'get_trackers_fields',
-				group_id : <?= $group_id ?>,
+				group_id : <?php echo $group_id ?>,
 				'trackers[]' : trackers
 			},
 			async: false
@@ -270,10 +270,10 @@ jQuery(function($){
 			if( answer['common_selects'] ) {
 				var selected = $('select[name=release_field] option:selected').val();
 				if( !selected ) {
-					selected = '<?= $release_field ?>';
+					selected = '<?php echo $release_field ?>';
 				}
 
-				var str = '<option value=""><?= _('Not defined') ?></option>';
+				var str = '<option value=""><?php echo _('Not defined') ?></option>';
 				$.each(answer['common_selects'], function(key, value)
 				{
 					str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
@@ -284,10 +284,10 @@ jQuery(function($){
 			if( answer['common_texts'] ) {
 				var selected = $('select[name=estimated_cost_field] option:selected').val();
 				if( !selected ) {
-					selected = '<?= $estimated_cost_field ?>';
+					selected = '<?php echo $estimated_cost_field ?>';
 				}
 
-				var str = '<option value=""><?= _('Not defined') ?></option>';
+				var str = '<option value=""><?php echo _('Not defined') ?></option>';
 				$.each(answer['common_texts'], function(key, value) {
 					str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
 				});
@@ -297,10 +297,10 @@ jQuery(function($){
 			if( answer['common_texts'] ) {
 				var selected = $('select[name=remaining_cost_field] option:selected').val();
 				if( !selected ) {
-					selected = '<?= $remaining_cost_field ?>';
+					selected = '<?php echo $remaining_cost_field ?>';
 				}
 
-				var str = '<option value=""><?= _('Not defined') ?></option>';
+				var str = '<option value=""><?php echo _('Not defined') ?></option>';
 				$.each(answer['common_texts'], function(key, value) {
 					str +='<option value="'+ key +'"'+ ( key == selected ? 'selected' : '' ) +'>'+ value +'</option>';
 				});
@@ -310,10 +310,10 @@ jQuery(function($){
 			if( answer['common_refs'] ) {
 				var selected = $('select[name=user_stories_reference_field] option:selected').val();
 				if( !selected ) {
-					selected = '<?= $user_stories_reference_field ?>';
+					selected = '<?php echo $user_stories_reference_field ?>';
 				}
 
-				user_story_ref_field = '<option value=""><?= _('Not defined') ?></option>';
+				user_story_ref_field = '<option value=""><?php echo _('Not defined') ?></option>';
 				$.each(answer['common_refs'], function(key, value) {
 					user_story_ref_field +='<option value="'+ key +'"'+ ( ( (key == selected) || (!selected && key=='user_story') ) ? 'selected' : '' ) +'>'+ value +'</option>';
 				});
@@ -321,7 +321,7 @@ jQuery(function($){
 				if( $('select[name=user_stories_tracker]').val() ) {
 					$('select[name=user_stories_reference_field]').empty().html(user_story_ref_field);
 				} else {
-					$('select[name=user_stories_reference_field]').empty().html('<option value=""><?= _('Not defined') ?></option>');
+					$('select[name=user_stories_reference_field]').empty().html('<option value=""><?php echo _('Not defined') ?></option>');
 				}
 			}
 
@@ -342,7 +342,7 @@ jQuery(function($){
 			loadUserStorySortFields();
 		} else {
 			$('#usrefreq').hide();
-			$('select[name=user_stories_reference_field]').empty().html('<option value=""><?= _('Not defined') ?></option>');
+			$('select[name=user_stories_reference_field]').empty().html('<option value=""><?php echo _('Not defined') ?></option>');
 		}
 	});
 

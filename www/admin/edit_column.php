@@ -69,23 +69,23 @@ $drop_rules_by_default = $column->getDropRulesByDefault(true);
 
 ?>
 
-<form action="/plugins/taskboard/admin/?group_id=<?= $group_id ?>&amp;action=edit_column" method="post">
+<form action="/plugins/taskboard/admin/?group_id=<?php echo $group_id ?>&amp;action=edit_column" method="post">
 <input type="hidden" name="post_changes" value="y">
-<input type="hidden" name="column_id" value="<?= $column_id ?>">
+<input type="hidden" name="column_id" value="<?php echo $column_id ?>">
 
 <h2>Edit column:</h2>
 <table>
-	<tr><td><strong><?php echo _('Title') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><input type="text" name="column_title" value="<?= htmlspecialchars( $column->getTitle() ) ?>"></td></tr>
-	<tr><td><strong><?php echo _('Title backgound color') ?></strong></td><td><?= $taskboard->colorBgChooser('title_bg_color', $column->getTitleBackgroundColor() ) ?></td></tr>
-	<tr><td><strong><?php echo _('Column Background color') ?></strong></td><td><?= $taskboard->colorBgChooser('column_bg_color', $column->getColumnBackgroundColor() ) ?></td></tr>
-	<tr><td><strong><?php echo _('Maximum tasks number') ?></strong></td><td><input type="text" name="column_max_tasks" value="<?= $column->getMaxTasks() ?>"></td></tr>
+	<tr><td><strong><?php echo _('Title') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><input type="text" name="column_title" value="<?php echo htmlspecialchars( $column->getTitle() ) ?>"></td></tr>
+	<tr><td><strong><?php echo _('Title backgound color') ?></strong></td><td><?php echo $taskboard->colorBgChooser('title_bg_color', $column->getTitleBackgroundColor() ) ?></td></tr>
+	<tr><td><strong><?php echo _('Column Background color') ?></strong></td><td><?php echo $taskboard->colorBgChooser('column_bg_color', $column->getColumnBackgroundColor() ) ?></td></tr>
+	<tr><td><strong><?php echo _('Maximum tasks number') ?></strong></td><td><input type="text" name="column_max_tasks" value="<?php echo $column->getMaxTasks() ?>"></td></tr>
 
 	<tr><td colspan="2"><strong>Resolutions:</strong></td></tr>
 <?php
 $columns_resolutions = $column->getResolutions();
 foreach( $taskboard->getAvailableResolutions() as $resolution ) {
 ?>
-	<tr><td><?= htmlspecialchars( $resolution ) ?></td><td><input type="checkbox" name="resolutions[]" value="<?= htmlspecialchars( $resolution)  ?>" <?= ( in_array( $resolution, $columns_resolutions) ? 'checked' : '') ?>></td></tr>
+	<tr><td><?php echo htmlspecialchars( $resolution ) ?></td><td><input type="checkbox" name="resolutions[]" value="<?php echo htmlspecialchars( $resolution)  ?>" <?php echo ( in_array( $resolution, $columns_resolutions) ? 'checked' : '') ?>></td></tr>
 <?php
 }
 ?>
@@ -93,7 +93,7 @@ foreach( $taskboard->getAvailableResolutions() as $resolution ) {
 
 	<tr><td><strong><?php echo _('Drop resolution by default') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><select id="resolution_by_default" name="resolution_by_default"></select></td></tr>
 	<tr><td><strong><?php echo _('Autoassign') ?></strong></td><td><input type="checkbox" name="autoassign" value="1" <?php  echo $drop_rules_by_default->getAutoassign() ? 'checked' : '' ; ?>></td></tr>
-	<tr><td><strong><?php echo _('Alert message') ?></strong></td><td><textarea name="alert" cols="79" rows="5" ><?= htmlspecialchars($drop_rules_by_default->getAlertText()) ?></textarea></td></tr>
+	<tr><td><strong><?php echo _('Alert message') ?></strong></td><td><textarea name="alert" cols="79" rows="5" ><?php echo htmlspecialchars($drop_rules_by_default->getAlertText()) ?></textarea></td></tr>
 </table>
 
 <p>
@@ -120,10 +120,10 @@ jQuery(function($){
 	}
 
 
-	loadResolutions('resolution_by_default', '<?= $column->getResolutionByDefault() ?>');
+	loadResolutions('resolution_by_default', '<?php echo $column->getResolutionByDefault() ?>');
 
 	$('input[name="resolutions[]"]').click( function () {
-		loadResolutions('resolution_by_default', '<?= $column->getResolutionByDefault() ?>');
+		loadResolutions('resolution_by_default', '<?php echo $column->getResolutionByDefault() ?>');
 	});
 });
 </script>

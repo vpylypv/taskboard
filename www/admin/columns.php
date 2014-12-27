@@ -88,14 +88,14 @@ foreach( $columns as $column ) {
 
 ?>
 
-<form action="/plugins/taskboard/admin/?group_id=<?= $group_id ?>&amp;action=columns" method="post">
+<form action="/plugins/taskboard/admin/?group_id=<?php echo $group_id ?>&amp;action=columns" method="post">
 <input type="hidden" name="post_changes" value="y">
 
 <h2>Add new column:</h2>
 <table>
 	<tr><td><strong><?php echo _('Title') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><input type="text" name="column_title"></td></tr>
-	<tr><td><strong><?php echo _('Title backgound color') ?></strong></td><td><?= $taskboard->colorBgChooser('title_bg_color') ?></td></tr>
-	<tr><td><strong><?php echo _('Column Background color') ?></strong></td><td><?= $taskboard->colorBgChooser('column_bg_color', 'none') ?></td></tr>
+	<tr><td><strong><?php echo _('Title backgound color') ?></strong></td><td><?php echo $taskboard->colorBgChooser('title_bg_color') ?></td></tr>
+	<tr><td><strong><?php echo _('Column Background color') ?></strong></td><td><?php echo $taskboard->colorBgChooser('column_bg_color', 'none') ?></td></tr>
 	<tr><td><strong><?php echo _('Maximum tasks number') ?></strong></td><td><input type="text" name="column_max_tasks"></td></tr>
 	<tr><td><strong><?php echo _('Drop resolution by default') ?></strong>&nbsp;<?php echo utils_requiredField(); ?></td><td><select id="resolution_by_default" name="resolution_by_default">
 <?php
