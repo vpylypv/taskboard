@@ -213,6 +213,8 @@ if( $taskboard->getReleaseField() ) {
 
 <script>
 var gGroupId = <?php echo $group_id ?>;
+var gIsManager = <?php echo ( $taskboard->TrackersAdapter->isManager() ? 'true' : 'false' ) ?>;
+var gIsTechnician = <?php echo ( $taskboard->TrackersAdapter->isTechnician() ? 'true' : 'false' ) ?>;
 bShowUserStories = <?php echo $taskboard->getUserStoriesTrackerID() ? 'true' : 'false' ?>;
 aUserStories = [];
 aPhases = []
@@ -224,7 +226,7 @@ jQuery( document ).ready(function( $ ) {
 		loadTaskboard( <?php echo $group_id ?> );
 	});
 
-
+	<?php if( user_getid()) { ?>
 	jQuery('#new-task-dialog').dialog(
 	{
 		autoOpen: false,
@@ -245,7 +247,8 @@ jQuery( document ).ready(function( $ ) {
 							tracker_id : jQuery('#tracker_id').val(),
 							user_story_id : jQuery('#user_story_id').val(), 
 							title : jQuery('#tracker-summary').val(),
-							desc : jQuery('#tracker-description').val() 
+							desc : jQuery('#tracker-description').val(),
+							release : jQuery('select[name="_release"]').val()
 						},
 						async: true
 					}).done(function( answer ) {
@@ -279,6 +282,7 @@ jQuery( document ).ready(function( $ ) {
 			jQuery('#tracker-summary').val('');
 			jQuery('#tracker-description').val('');
 		}
+		<?php } ?>
 	});
 
 	jQuery('#tracker-summary, #tracker-description').keyup( function () {

@@ -559,7 +559,7 @@ class TaskBoard extends Error {
 	
 		$tasks_trackers = $this->getUsedTrackersData()	;
 		foreach( $tasks_trackers as $tasks_tracker_data ) {
-			$tasks = $this->TrackersAdapter->getTasks($tasks_tracker_data['group_artifact_id'], $assigned_to, $this->getReleaseField() ,$release);
+			$tasks = $this->TrackersAdapter->getTasks($tasks_tracker_data['group_artifact_id'], $assigned_to, $release);
 			foreach( $tasks as $task ) {
 				$task_maped = $this->getMappedTask( $task );
 				$stories[intval($task_maped['user_story'])]['tasks'][] = $task_maped ;

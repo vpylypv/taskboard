@@ -8,6 +8,7 @@
 - DONE View - order user stories by priority (user story points)
 - DONE View  - first column by default 
 - DONE View - filter by assigned persons
+- Releases are based either on US or on tasks !!!
 - View - auto ref rate support
 - Admin - auto ref rate support
 - Admin - adapters - coloring support

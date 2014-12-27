@@ -50,7 +50,11 @@ function loadTaskboard( group_id ) {
 		};
 
 		initUserStories();
-		initEditable();
+		
+		// only tracker manager can modify tasks
+		if( gIsManager ) {
+			initEditable();
+		}
 	});
 }
 
@@ -183,13 +187,15 @@ function initUserStory( oUserStory ) {
 			var sPhaseId = "#" + aPhases[i].id + "-" + oUserStory.id;
 
 			//make phase droppable
-			jQuery( sPhaseId )
-				.data('phase_id', aPhases[i].id)
-				.droppable( {
-					accept: '.agile-sticker-task-' + oUserStory.id,
-					hoverClass: 'agile-phase-hovered',
-					drop: helperTaskDrop
-				} );
+			if( gIsTechnician ) {
+				jQuery( sPhaseId )
+					.data('phase_id', aPhases[i].id)
+					.droppable( {
+						accept: '.agile-sticker-task-' + oUserStory.id,
+						hoverClass: 'agile-phase-hovered',
+						drop: helperTaskDrop
+					} );
+			}
 
 			if( aPhases[i].background ) {
 				jQuery("#" + aPhases[i].id + "-" + oUserStory.id).css('background-color', aPhases[i].background );
@@ -209,21 +215,24 @@ function drawUserStory( oUserStory ) {
 		}
 	}
 
-	for(var j=0 ; j<oUserStory.tasks.length ; j++) {
-		jQuery('#task-' + oUserStory.tasks[j].id)
-			.data('task_id', oUserStory.tasks[j].id)
-			.data('user_story_id', oUserStory.id)
-			.draggable( {
-				containment: '#agile-board',
-				//cursor: 'move',
-				stack: 'div',
-				revert: true,
-				start: helperTaskStart,
-				stop: helperTaskStop,
-				helper: "clone",
-				distance: 10
-			} );
-	}			
+	// only technician can move tasks
+	if( gIsTechnician ) {
+		for(var j=0 ; j<oUserStory.tasks.length ; j++) {
+			jQuery('#task-' + oUserStory.tasks[j].id)
+				.data('task_id', oUserStory.tasks[j].id)
+				.data('user_story_id', oUserStory.id)
+				.draggable( {
+					containment: '#agile-board',
+					//cursor: 'move',
+					stack: 'div',
+					revert: true,
+					start: helperTaskStart,
+					stop: helperTaskStop,
+					helper: "clone",
+					distance: 10
+				} );
+		}
+	}
 }
 
 function drawTasks( oUserStory, sPhaseId ) {

@@ -31,10 +31,11 @@ $tracker_id = getIntFromRequest('tracker_id');
 $user_story_id = getIntFromRequest('user_story_id',0);
 $desc = getStringFromRequest('desc', '');
 $title = getStringFromRequest('title', '');
+$release = getStringFromRequest('release', NULL);
 
 if( $tracker_id && $desc && $title  ) {
 	db_begin();
-	$msg = $taskboard->TrackersAdapter->createTask($tracker_id, $title, $desc, $user_story_id, $taskboard->getUserStoriesReferenceField());
+	$msg = $taskboard->TrackersAdapter->createTask($tracker_id, $title, $desc, $user_story_id, $release);
 	if( $msg ) {
 		$ret['alert'] = $msg;	
 		db_rollback();

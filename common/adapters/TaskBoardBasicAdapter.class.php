@@ -56,6 +56,9 @@ class TaskBoardBasicAdapter {
 		return $this->_atf;
 	}
 
+	/**
+	 * Get an instance of artifacts tracker, used for user stories tracking
+	 */
 	function getUserStoriesTracker() {
 		if( !$this->_ust ) {
 			$this->_ust = new ArtifactType($this->TaskBoard->Group, $this->TaskBoard->getUserStoriesTrackerID() );
@@ -64,6 +67,13 @@ class TaskBoardBasicAdapter {
 		return $this->_ust;
 	}
 
+	/**
+	 * Get list of instances of artifacts trackers, used for tasks tracking
+	 * 
+	 * @param    integer    group artifact identifier (primary key)
+	 *
+	 * @return   array
+	 */
 	function getTasksTracker($tracker_id) {
 		if( !array_key_exists($tracker_id, $this->_tt) ) {
 			$this->_tt[$tracker_id] = new ArtifactType($this->TaskBoard->Group, $tracker_id );
@@ -73,7 +83,9 @@ class TaskBoardBasicAdapter {
 	}
 
 	/**
-	 * TODO - filters
+	 * Get list of instances of user stories artifacts
+	 *
+	 * @return   array
 	 */
 	function getUserStories($release=NULL) {
 		$at = $this->getUserStoriesTracker();
@@ -91,7 +103,11 @@ class TaskBoardBasicAdapter {
 	}
 
 	/**
- 	 *
+	 * Get an extra fields hash, where key is an extra field alias, and a value is an extra field identifier (primary key)
+	 *
+	 * @param    integer    group artifact identifier (primary key)
+	 *
+	 * @return   array
 	 */
 	function getFieldsIds($tracker_id) {
 		$ret = array(
@@ -116,7 +132,13 @@ class TaskBoardBasicAdapter {
 	}
 	
 	/**
+	 * Get a list of extra field elements.
+	 * Item of the list is a hash, where key is an element name, and a value is an element identifier (primary key)
+	 * 
+	 * @param    integer    group artifact identifier (primary key)
+	 * @param    string     extra field alias
 	 *
+	 * @return   array
 	 */
 	function getExtraFieldValues($tracker_id, $field_alias ) {
 		$ret = array();
@@ -147,9 +169,15 @@ class TaskBoardBasicAdapter {
 	}
 
 	/**
+	 * Get a list of task artifacts, linked to the give tracker according to the filter crtireria (assigned tech and sprint/release)
+	 * 
+	 * @param    integer    group artifact identifier (primary key)
+	 * @param    integer    optional identifier of assigned person
+	 * @param    string     optional value (name) of sprint/release 
 	 *
+	 * @return   array
 	 */
-	function getTasks($tracker_id,$assigned_to=NULL, $release_field_alias=NULL, $release_value=NULL) {
+	function getTasks($tracker_id,$assigned_to=NULL, $release_value=NULL) {
 		$tasks = array();
 
 		$at = $this->getTasksTracker($tracker_id);
@@ -163,8 +191,10 @@ class TaskBoardBasicAdapter {
 
 			$_status = 1;
 			$extra_fields = array();
+			
+			$release_field_alias = $this->TaskBoard->getReleaseField();
 
-			if( $release_field_alias  && $release_value ) {
+			if( $release_field_alias && $release_value ) {
 				
 				
 				$fields = $this->getFieldsIds($tracker_id);
@@ -185,26 +215,52 @@ class TaskBoardBasicAdapter {
 	}
 
 	/**
+	 * Get an instance of artifacte
+	 * 
+	 * @param    integer    artifact identifier (primary key)
 	 *
+	 * @return   object
 	 */
 	function getTask( $task_id ) {
 		return artifact_get_object( $task_id );
 	}
 
 	/**
+	 * Create new task artifact
+	 * 
+	 * @param    integer    group artifact identifier (primary key)
+	 * @param    string     artifact summary
+	 * @param    string     artifact description
+	 * @param    integer    user story artifact identifier
+	 * @param    string     release name
 	 *
+	 * @return   string     error message in case of fail
 	 */
-	function createTask( $tracker_id, $title, $description, $user_story_id=null, $user_story_alias=null ) {
+	function createTask( $tracker_id, $title, $description, $user_story_id=null, $release_value=NULL ) {
 		$tracker = $this->getTasksTracker($tracker_id);
 		if( $tracker ) {
 			$artifact = new Artifact( $tracker );
 
 			$extra_fields = array();
+			$user_story_alias = $this->TaskBoard->getUserStoriesReferenceField();
+			$release_alias = $this->TaskBoard->getReleaseField();
 
-			if($user_story_id && $user_story_alias ) {
-				$fields = $this->getFieldsIds($tracker_id);
+			$fields = $this->getFieldsIds($tracker_id);
+			
+			// link create task to user story (if specified)
+			if( $user_story_id && $user_story_alias ) {
 				if( array_key_exists($user_story_alias, $fields) ) {
 					$extra_fields[ $fields[ $user_story_alias ] ] = $user_story_id;
+				}
+			}
+
+			// link create task to release (if specified)
+			if( $release_value && $release_alias ) {
+				if( array_key_exists($release_alias, $fields) ) {
+					$elements = $this->getExtraFieldValues($tracker_id, $release_alias);
+					if( array_key_exists($release_value, $elements) ) {
+						$extra_fields[ $fields[ $release_alias ] ] = $elements[$release_value];
+					}
 				}
 			}
 
@@ -220,9 +276,17 @@ class TaskBoardBasicAdapter {
 	
 
 	/**
+	 * Update existing task artifact
+	 * 
+	 * @param    integer    group artifact identifier (primary key)
+	 * @param    integer    identifier of assigned person
+	 * @param    string     resolution value (name)
+	 * @param    string     artifact summary
+	 * @param    string     artifact description
 	 *
+	 * @return   string     error message in case of fail
 	 */
-	function updateTask(&$artifact, $assigned_to, $resolution, $title=NULL, $description=NULL ) {
+	function updateTask( &$artifact, $assigned_to, $resolution, $title=NULL, $description=NULL ) {
 		if( !$assigned_to ) {
 			$assigned_to = $artifact->getAssignedTo();
 		}
@@ -260,12 +324,35 @@ class TaskBoardBasicAdapter {
 			$extra_fields,
 			$description
 			);
+		
+		$user_id = user_getid();
+		if( $ret && ( $user_id == $assigned_to ) ) {
+			$ret = $artifact->assignToMe();
+		}
 
 		if( !$ret ) {
 			return $artifact->getErrorMessage();
 		}
 
 		return '';
+	}
+	
+	/**
+	 * Returns true if current user can manage trackers
+	 *
+	 * @return    boolean
+	 */
+	function isManager () {
+		return true;
+	}
+	
+	/**
+	 * Returns true if current user can modify artifacts
+	 *
+	 * @return    boolean
+	 */
+	function isTechnician () {
+		return true;
 	}
 
 	/**
