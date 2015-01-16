@@ -1,7 +1,7 @@
 <?php
 /**
  *
- * Copyright (C) 2013 Vitaliy Pylypiv <vitaliy.pylypiv@gmail.com> 
+ * Copyright (C) 2013 Vitaliy Pylypiv <vitaliy.pylypiv@gmail.com>
  *
  * This file is part of FusionForge.
  *
@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
- * 
+ *
  * FusionForge is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -29,7 +29,7 @@ require_once $gfconfig.'plugins/taskboard/config.php' ;
 
 /**
  *       Factory method which creates a taskboard from a taskboard ID
- *       
+ *
  *       @param int      The taskboard ID
  *       @param array    The result array, if it's passed in
  *       @return object  TaskBoard object
@@ -74,7 +74,7 @@ class TaskBoard extends Error {
 	/**
 	 * Trackers adapter object
 	 *
-	 * @var         object  
+	 * @var         object
 	 */
 	var $TrackersAdapter;
 
@@ -113,7 +113,7 @@ class TaskBoard extends Error {
 		global $gfplugins,$plugins_taskboard_trackers_adapter_class, $plugins_taskboard_trackers_adapter_module;
 		if( !isset($plugins_taskboard_trackers_adapter_module) || !isset($plugins_taskboard_trackers_adapter_class) ) {
 			$plugins_taskboard_trackers_adapter_module = $gfplugins.'taskboard/common/adapters/TaskBoardBasicAdapter.class.php';
-			$plugins_taskboard_trackers_adapter_class  = 'TaskBoardBasicAdapter';			
+			$plugins_taskboard_trackers_adapter_class  = 'TaskBoardBasicAdapter';
 		}
 
 		require_once( $plugins_taskboard_trackers_adapter_module );
@@ -135,7 +135,7 @@ class TaskBoard extends Error {
 		 */
 	function create( $trackers, $bgcolors, $release_field_alias=NULL, $release_field_tracker=1,
 			$estimated_cost_field_alias=NULL, $remaining_cost_field_alias=NULL,
-			$user_stories_tracker=NULL, $user_stories_reference_field=NULL, 
+			$user_stories_tracker=NULL, $user_stories_reference_field=NULL,
 			$user_stories_sort_field=NULL, $first_column_by_default=1) {
 		//
 		//      data validation
@@ -147,14 +147,14 @@ class TaskBoard extends Error {
 
 		if( count($trackers) == 0 ) {
 			$this->setError('Taskboard must be linked at least to one tracker');
-			return false;	
+			return false;
 		}
 
 		$ret = true;
 		db_begin();
-	
+
 		$sql = sprintf(
-			"INSERT INTO plugin_taskboard(group_id, release_field_alias,  release_field_tracker, estimated_cost_field_alias, remaining_cost_field_alias, user_stories_group_artifact_id, user_stories_reference_field_alias,user_stories_sort_field_alias, first_column_by_default) VALUES(%d,%s,%s,%s,%s,%s,%s, %d)", 
+			"INSERT INTO plugin_taskboard(group_id, release_field_alias,  release_field_tracker, estimated_cost_field_alias, remaining_cost_field_alias, user_stories_group_artifact_id, user_stories_reference_field_alias,user_stories_sort_field_alias, first_column_by_default) VALUES(%d,%s,%s,%s,%s,%s,%s, %d)",
 			$this->Group->getID(),
 			( $release_field_alias ? "'$release_field_alias'": 'NULL' ),
 			$release_field_tracker,
@@ -172,7 +172,7 @@ class TaskBoard extends Error {
  		} else {
 			$this->data_array['taskboard_id'] = db_insertid($res,'plugin_taskboard','taskboard_id');
 		}
-		
+
 		if( $ret ) {
 			foreach( $trackers as $tracker_id ) {
 				$ret = $this->addUsedTracker( $tracker_id, ( array_key_exists($tracker_id, $bgcolors) ? $bgcolors[$tracker_id]  : NULL) );
@@ -215,7 +215,7 @@ class TaskBoard extends Error {
 		}
 
 		if( count($trackers) == 0 ) {
-			$thiss->setError('Taskboard must be linked at least to one tracker');
+			$this->setError('Taskboard must be linked at least to one tracker');
 			return false;
 		}
 
@@ -248,15 +248,15 @@ class TaskBoard extends Error {
 			foreach( $trackers as $tracker_id ) {
 				if( in_array( $tracker_id, $old_trackers ) ) {
 					// update tracker
-					$ret = $this->updateUsedTracker( 
-						$tracker_id, 
-						( array_key_exists($tracker_id, $bgcolors) ? $bgcolors[$tracker_id]  : NULL) 
+					$ret = $this->updateUsedTracker(
+						$tracker_id,
+						( array_key_exists($tracker_id, $bgcolors) ? $bgcolors[$tracker_id]  : NULL)
 					);
 				} else {
 					// add tracker
-					$ret = $this->addUsedTracker( 
-						$tracker_id, 
-						( array_key_exists($tracker_id, $bgcolors) ? $bgcolors[$tracker_id]  : NULL) 
+					$ret = $this->addUsedTracker(
+						$tracker_id,
+						( array_key_exists($tracker_id, $bgcolors) ? $bgcolors[$tracker_id]  : NULL)
 					);
 				}
 			}
@@ -348,7 +348,7 @@ class TaskBoard extends Error {
 	function getReleaseField() {
 		return $this->data_array['release_field_alias'];
 	}
-	
+
 	/**
 	 *      getReleaseFieldTracker - get a source tracker type of field, used for release/sprint
 	 *
@@ -424,7 +424,7 @@ class TaskBoard extends Error {
 			$this->setError('Cannot get list of used trackers.');
 			return false;
 		}
-		
+
 		$trackers = array();
 		while( $row =  db_fetch_array($res) ) {
 			$trackers[] = $row['group_artifact_id'];
@@ -470,7 +470,7 @@ class TaskBoard extends Error {
 
 	/**
 	 *      addUsedTracker - add a tracker to use with taskboard
-	 *      
+	 *
 	 *      @param	int	tracker identifier
 	 *      @param  string	optional card background color
 	 *
@@ -488,7 +488,7 @@ class TaskBoard extends Error {
 
 	/**
 	 *      updateUsedTracker - update used tracker
-	 *      
+	 *
 	 *      @param  int     tracker identifier
 	 *      @param  string  optional card background color
 	 *
@@ -506,7 +506,7 @@ class TaskBoard extends Error {
 
 	/**
 	 *      deleteUsedTracker - delete used tracker
-	 *      
+	 *
 	 *      @param  int     tracker identifier
 	 *
 	 *      @return bool
@@ -549,7 +549,7 @@ class TaskBoard extends Error {
 				return false;
 			}
 		}
-		
+
 		$task_release = NULL;
 		$user_story_release = NULL;
 
@@ -558,9 +558,9 @@ class TaskBoard extends Error {
 		} else {
 			$user_story_release = $release;
 		}
-		
+
 		$us = $this->TrackersAdapter->getUserStories($release);
-		
+
 		foreach( $us as $story) {
 			$stories[$story->getID()] = array(
 				'id' => $story->getID(),
@@ -578,7 +578,7 @@ class TaskBoard extends Error {
 				//sort by GF priority if another field for sorting is not defined
 				$stories[$story->getID()]['order'] = $stories[$story->getID()]['priority'];
 			}
-			
+
 			if( $this->getReleaseFieldTracker() == RELEASE_OF_USER_STORY ) {
 				$tasks_trackers = $this->getUsedTrackersData();
 				foreach( $tasks_trackers as $tasks_tracker_data ) {
@@ -591,7 +591,7 @@ class TaskBoard extends Error {
 			}
 		}
 
-	
+
 		if( $this->getReleaseFieldTracker() == RELEASE_OF_TASK ) {
 			$tasks_trackers = $this->getUsedTrackersData();
 			foreach( $tasks_trackers as $tasks_tracker_data ) {
@@ -612,7 +612,7 @@ class TaskBoard extends Error {
 				$ret_stories[] = $us;
 			}
 		}
-		
+
 		usort( $ret_stories, array( $this, 'sortUserStories' ) );
 
 		return $ret_stories;
@@ -636,7 +636,7 @@ class TaskBoard extends Error {
 			error_log( 'Column is not defined for resolution '.$task_maped['resolution'].'(task '.$task->getID().')' );
 			if( $this->getFirstColumnByDefault() ) {
 				if( !$_first_column_id ) {
-					$columns = $this->getColumns();			
+					$columns = $this->getColumns();
 					$_first_column_id = $columns[0]->getID();
 					error_log( 'Use column '.$_first_column_id.' as a first column by default');
 				}
@@ -683,11 +683,11 @@ class TaskBoard extends Error {
 
 	private function _mapTask( $task ) {
 		$ret = array();
-	
+
 		$us_ref_field = $this->getUserStoriesReferenceField();
 
 		$fields_ids = $this->TrackersAdapter->getFieldsIds($task->ArtifactType->getID() );
-		$extra_data = $task->getExtraFieldDataText();	
+		$extra_data = $task->getExtraFieldDataText();
 
 		$ret['id'] = $task->getID();
 		$ret['title'] = $task->getSummary();
@@ -749,12 +749,12 @@ class TaskBoard extends Error {
 		db_free_result($res);
 
 		$res = db_query_params (
-			'INSERT INTO plugin_taskboard_columns(taskboard_id, title, title_background_color, column_background_color, max_tasks, order_num) VALUES($1,$2,$3,$4,$5,$6)', 
+			'INSERT INTO plugin_taskboard_columns(taskboard_id, title, title_background_color, column_background_color, max_tasks, order_num) VALUES($1,$2,$3,$4,$5,$6)',
 			array (
 				$this->getID(),
 				$title,
-				$title_bg_color, 
-				$column_bg_color, 
+				$title_bg_color,
+				$column_bg_color,
 				intval($max_tasks),
 				$order
 			)
@@ -766,10 +766,10 @@ class TaskBoard extends Error {
 
 		return true;
 	}
-	
+
 	function getExtraFieldValues($extra_field_alias) {
 		$ret = array();
-	
+
 		$tasks_trackers = $this->getUsedTrackersIds()  ;
 		foreach( $tasks_trackers as $tracker_id ) {
 			$ef_values = $this->TrackersAdapter->getExtraFieldValues($tracker_id, $extra_field_alias);
@@ -785,13 +785,13 @@ class TaskBoard extends Error {
 				$ret = $buf;
 			}
 		}
-	
+
 		return $ret;
 	}
-	
+
 	function getReleaseValues() {
 		$ret = array();
-	
+
 		if( $this->getReleaseFieldTracker() == 1 ) {
 			// get values from tasks trackers
 			$ret = $this->getExtraFieldValues( $this->getReleaseField() );
@@ -799,7 +799,7 @@ class TaskBoard extends Error {
 			// get values from user stories trackers
 			$ret = $this->TrackersAdapter->getExtraFieldValues( $this->getUserStoriesTrackerID(), $this->getReleaseField() );
 		}
-	
+
 		return $ret;
 	}
 
